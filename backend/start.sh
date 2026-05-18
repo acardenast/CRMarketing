@@ -1,6 +1,7 @@
 #!/bin/bash
 cd /var/www/html
 composer install --no-dev --optimize-autoloader
+touch /var/www/html/database/database.sqlite
 php artisan key:generate --force
 php artisan migrate:fresh --force
 php artisan db:seed --force 2>/dev/null || true

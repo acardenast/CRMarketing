@@ -24,7 +24,8 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
       /etc/apache2/conf-available/*.conf \
       /etc/apache2/sites-available/*.conf
 
-RUN a2enmod rewrite
+RUN a2dismod mpm_event mpm_worker mpm_prefork 2>/dev/null || true \
+    && a2enmod mpm_prefork
 
 # Fix MPM conflict
 RUN rm -f /etc/apache2/mods-enabled/mpm_event.conf \
