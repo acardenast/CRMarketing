@@ -30,8 +30,12 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
 # mod_rewrite
 RUN a2enmod rewrite
 
-RUN chown -R www-data:www-data /var/www/html
+COPY . .
+
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 WORKDIR /var/www/html
 
 EXPOSE 80
+
+CMD ["/bin/bash", "/var/www/html/start.sh"]
