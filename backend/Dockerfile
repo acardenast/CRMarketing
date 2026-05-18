@@ -30,6 +30,8 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
 # mod_rewrite
 RUN a2enmod rewrite
 
+RUN a2dismod mpm_event && a2enmod mpm_prefork
+
 COPY . .
 
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
