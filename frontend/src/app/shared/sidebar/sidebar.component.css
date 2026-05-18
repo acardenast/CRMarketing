@@ -1,0 +1,117 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  height: 56px;
+  padding: 0 1.5rem;
+  background: #01696f;
+  border-bottom: 1px solid #0c4e54;
+  box-shadow: 0 2px 8px rgba(1,105,111,.25);
+}
+
+/* Logo */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+/* Nav links */
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  flex: 1;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .4rem .75rem;
+  border-radius: 7px;
+  font-size: .875rem;
+  font-weight: 500;
+  color: rgba(255,255,255,.75);
+  text-decoration: none;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+
+  &:hover  { background: rgba(255,255,255,.12); color: #ffffff; }
+  &.active { background: rgba(255,255,255,.2);  color: #ffffff; font-weight: 600; }
+}
+
+/* Usuario */
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+.user-name {
+  font-size: .875rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.user-role {
+  font-size: .75rem;
+  color: rgba(255,255,255,.65);
+  text-transform: capitalize;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .875rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,.35);
+}
+
+.btn-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  border: 1.5px solid rgba(255,255,255,.3);
+  background: transparent;
+  color: rgba(255,255,255,.8);
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+
+  &:hover {
+    background: rgba(255,255,255,.15);
+    color: #ffffff;
+    border-color: rgba(255,255,255,.5);
+  }
+}
+
+.rol-admin   { background:#fce7f3; color:#9d174d; }
+.rol-empresa { background:#dbeafe; color:#1e40af; }
+.rol-cliente { background:#d1fae5; color:#065f46; }

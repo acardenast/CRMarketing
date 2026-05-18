@@ -1,0 +1,10 @@
+@if (showSidebar()) {
+  <div style="display:flex; flex-direction:column; min-height:100vh; background:#f7f6f2;">
+    <app-sidebar></app-sidebar>
+    <main style="flex:1; padding:1.5rem 2rem; width:100%;">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+} @else {
+  <router-outlet></router-outlet>
+}

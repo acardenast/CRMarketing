@@ -1,0 +1,55 @@
+<div class="pw">
+  <div class="ph">
+    <div>
+      <h1 class="pt">Chat del cliente</h1>
+      <p class="ps">Selecciona una acción para abrir el chat</p>
+    </div>
+    <a routerLink="/clientes" class="ab ae">← Volver</a>
+  </div>
+
+  @if (cargando) { <p class="loading">Cargando…</p> }
+  @if (error)    { <p>{{ error }}</p> }
+
+  @if (!cargando) {
+    @if (acciones.length === 0) {
+      <div class="card">
+        <div class="empty">Este cliente no tiene acciones todavía</div>
+      </div>
+    }
+    @if (acciones.length > 0) {
+      <div class="card">
+        <table>
+          <colgroup>
+            <col style="width:8%">
+            <col style="width:35%">
+            <col style="width:15%">
+            <col style="width:15%">
+            <col style="width:27%">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Título</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th class="tar">Chat</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of acciones; track a.id) {
+              <tr>
+                <td><span class="tipo-icono">{{ getIconoTipo(a.tipo) }}</span></td>
+                <td class="trunc">{{ a.titulo || a.descripcion || '—' }}</td>
+                <td><span class="badge b-{{ a.estado }}">{{ a.estado }}</span></td>
+                <td class="mu">{{ a.fecha_inicio | date:'dd/MM/yyyy' }}</td>
+                <td class="tar">
+                  <a [routerLink]="['/chat', a.id]" class="ab ae">💬 Abrir chat</a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

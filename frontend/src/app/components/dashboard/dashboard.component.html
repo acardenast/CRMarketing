@@ -1,0 +1,54 @@
+<div class="dashboard">
+  <h1>Dashboard CRM</h1>
+
+  <div class="stats" *ngIf="stats">
+    <div class="stat-card">
+      <h3>Total Clientes</h3>
+      <p class="number">{{ stats.total_clientes || 0 }}</p>
+    </div>
+    
+    <div class="stat-card">
+      <h3>Clientes Activos</h3>
+      <p class="number">{{ stats.clientes_activos || 0 }}</p>
+    </div>
+    
+    <div class="stat-card">
+      <h3>Leads</h3>
+      <p class="number">{{ stats.leads || 0 }}</p>
+    </div>
+    
+    <div class="stat-card">
+      <h3>En Negociación</h3>
+      <p class="number">{{ stats.en_negociacion || 0 }}</p>
+    </div>
+  </div>
+
+  <div class="clientes-section">
+    <h2>Clientes Recientes</h2>
+    
+    <div *ngIf="loading">Cargando...</div>
+    
+    <table *ngIf="!loading && clientes.length > 0">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Empresa</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of clientes">
+          <td>{{ cliente.nombre }}</td>
+          <td>{{ cliente.email }}</td>
+          <td>{{ cliente.empresa_cliente || '-' }}</td>
+          <td>
+            <span class="badge" [class]="'badge-' + cliente.estado">
+              {{ cliente.estado }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<div style="max-width:560px;">
+
+  <div style="margin-bottom:1.25rem;">
+    <a routerLink="/empresas" style="display:inline-flex;align-items:center;gap:0.375rem;font-size:0.8125rem;color:#64748b;text-decoration:none;font-weight:500;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+      Volver a empresas
+    </a>
+  </div>
+
+  <div class="card" style="padding:1.75rem;">
+
+    <div style="margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #f1f5f9;">
+      <h1 class="page-title">{{ esEdicion ? 'Editar empresa' : 'Nueva empresa' }}</h1>
+      <p class="page-subtitle">{{ esEdicion ? 'Modifica los datos de la empresa' : 'Registra una nueva empresa en el CRM' }}</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-error" style="margin-bottom:1.25rem;">{{ error }}</div>
+
+    <form (ngSubmit)="guardar()" #formulario="ngForm" style="display:flex;flex-direction:column;gap:1.125rem;">
+
+      <div class="form-group">
+        <label class="form-label">Nombre <span style="color:#dc2626;">*</span></label>
+        <input type="text" class="form-control" [(ngModel)]="empresa.nombre" name="nombre" required placeholder="Nombre de la empresa"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email <span style="color:#dc2626;">*</span></label>
+        <input type="email" class="form-control" [(ngModel)]="empresa.email" name="email" required placeholder="correo@empresa.com"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Teléfono</label>
+        <input type="text" class="form-control" [(ngModel)]="empresa.telefono" name="telefono" placeholder="+34 900 000 000"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Plan</label>
+        <select class="form-control" [(ngModel)]="empresa.plan" name="plan">
+          <option value="basico">Básico</option>
+          <option value="premium">Premium</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:0.625rem;padding-top:0.5rem;border-top:1px solid #f1f5f9;margin-top:0.375rem;">
+        <button type="submit" class="btn btn-primary" [disabled]="guardando || formulario.invalid">
+          {{ guardando ? 'Guardando...' : (esEdicion ? 'Actualizar empresa' : 'Crear empresa') }}
+        </button>
+        <a routerLink="/empresas" class="btn btn-secondary">Cancelar</a>
+      </div>
+
+    </form>
+  </div>
+</div>

@@ -1,0 +1,77 @@
+<div class="registro-wrapper">
+  <div class="registro-card">
+    <div class="registro-header">
+      <svg width="40" height="40" viewBox="0 0 44 44" fill="none">
+        <rect width="44" height="44" rx="12" fill="#01696f"/>
+        <path d="M14 30V16l8-4 8 4v14l-8 4-8-4z" stroke="white" stroke-width="2" fill="none"/>
+        <circle cx="22" cy="22" r="3" fill="white"/>
+      </svg>
+      <h1>Registrar empresa</h1>
+      <p>Crea tu cuenta para gestionar tus clientes</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" novalidate>
+
+      <h3 class="section-title">Datos de la empresa</h3>
+
+      <div class="field">
+        <label>Nombre de la empresa *</label>
+        <input type="text" [(ngModel)]="form.nombre_empresa" name="nombre_empresa" placeholder="Mi Empresa S.L." required />
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Email de la empresa *</label>
+          <input type="email" [(ngModel)]="form.email_empresa" name="email_empresa" placeholder="empresa@mail.com" required />
+        </div>
+        <div class="field">
+          <label>Teléfono</label>
+          <input type="text" [(ngModel)]="form.telefono_empresa" name="telefono_empresa" placeholder="+34 600 000 000" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Plan</label>
+        <select [(ngModel)]="form.plan" name="plan">
+          <option value="basico">Básico</option>
+          <option value="premium">Premium</option>
+        </select>
+      </div>
+
+      <h3 class="section-title">Tu cuenta de acceso</h3>
+
+      <div class="row2">
+        <div class="field">
+          <label>Nombre completo *</label>
+          <input type="text" [(ngModel)]="form.name" name="name" placeholder="Ana García" required />
+        </div>
+        <div class="field">
+          <label>Nombre de usuario *</label>
+          <input type="text" [(ngModel)]="form.username" name="username" placeholder="anagarcia" required />
+        </div>
+      </div>
+      <div class="field">
+        <label>Email de acceso *</label>
+        <input type="email" [(ngModel)]="form.email" name="email" placeholder="tu@email.com" required />
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Contraseña *</label>
+          <input type="password" [(ngModel)]="form.password" name="password" required />
+        </div>
+        <div class="field">
+          <label>Repetir contraseña *</label>
+          <input type="password" [(ngModel)]="form.password_confirmation" name="password_confirmation" required />
+        </div>
+      </div>
+
+      @if (error) { <div class="error-msg">{{ error }}</div> }
+
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        {{ loading ? 'Registrando…' : 'Crear cuenta' }}
+      </button>
+    </form>
+
+    <div class="back-link">
+      <a routerLink="/login">← Volver al login</a>
+    </div>
+  </div>
+</div>

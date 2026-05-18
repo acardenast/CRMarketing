@@ -1,0 +1,81 @@
+<div style="max-width:680px;">
+
+  <div style="margin-bottom:1.25rem;">
+    <a routerLink="/clientes" style="display:inline-flex;align-items:center;gap:0.375rem;font-size:0.8125rem;color:#64748b;text-decoration:none;font-weight:500;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+      Volver a clientes
+    </a>
+  </div>
+
+  <div class="card" style="padding:1.75rem;">
+
+    <div style="margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #f1f5f9;">
+      <h1 class="page-title">{{ esEdicion ? 'Editar cliente' : 'Nuevo cliente' }}</h1>
+      <p class="page-subtitle">{{ esEdicion ? 'Modifica los datos del cliente' : 'Completa el formulario para registrar un nuevo cliente' }}</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-error" style="margin-bottom:1.25rem;">{{ error }}</div>
+
+    <form (ngSubmit)="guardar()" #formulario="ngForm" style="display:flex;flex-direction:column;gap:1.125rem;">
+
+      <div class="form-group">
+        <label class="form-label">Nombre <span style="color:#dc2626;">*</span></label>
+        <input type="text" class="form-control" [(ngModel)]="cliente.nombre" name="nombre" required placeholder="Nombre completo"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email <span style="color:#dc2626;">*</span></label>
+        <input type="email" class="form-control" [(ngModel)]="cliente.email" name="email" required placeholder="correo@ejemplo.com"/>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group">
+          <label class="form-label">Teléfono</label>
+          <input type="text" class="form-control" [(ngModel)]="cliente.telefono" name="telefono" placeholder="+34 600 000 000"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Empresa del cliente</label>
+          <input type="text" class="form-control" [(ngModel)]="cliente.empresa_cliente" name="empresa_cliente" placeholder="Nombre de su empresa"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Empresa (CRM) <span style="color:#dc2626;">*</span></label>
+        <select class="form-control" [(ngModel)]="cliente.empresa_id" name="empresa_id" required>
+          <option [ngValue]="null" disabled>Selecciona una empresa</option>
+          <option *ngFor="let e of empresas" [ngValue]="e.id">{{ e.nombre }}</option>
+        </select>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group">
+          <label class="form-label">Estado</label>
+          <select class="form-control" [(ngModel)]="cliente.estado" name="estado">
+            <option value="lead">Lead</option>
+            <option value="contactado">Contactado</option>
+            <option value="negociacion">Negociación</option>
+            <option value="cliente">Cliente</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha de contacto</label>
+          <input type="date" class="form-control" [(ngModel)]="cliente.fecha_contacto" name="fecha_contacto"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Notas</label>
+        <textarea class="form-control" [(ngModel)]="cliente.notas" name="notas" rows="3" placeholder="Observaciones sobre el cliente..."></textarea>
+      </div>
+
+      <div style="display:flex;gap:0.625rem;padding-top:0.5rem;border-top:1px solid #f1f5f9;margin-top:0.375rem;">
+        <button type="submit" class="btn btn-primary" [disabled]="guardando || formulario.invalid">
+          {{ guardando ? 'Guardando...' : (esEdicion ? 'Actualizar cliente' : 'Crear cliente') }}
+        </button>
+        <a routerLink="/clientes" class="btn btn-secondary">Cancelar</a>
+      </div>
+
+    </form>
+  </div>
+</div>

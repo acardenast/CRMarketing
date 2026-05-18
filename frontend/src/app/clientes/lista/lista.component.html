@@ -1,0 +1,50 @@
+<div class="pw">
+  <div class="ph">
+    <div>
+      <h1 class="pt">Clientes</h1>
+      <p class="ps">{{ clientes.length }} cliente(s) registrado(s)</p>
+    </div>
+    <a routerLink="/clientes/nuevo" class="badd">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nuevo cliente
+    </a>
+  </div>
+
+  @if (cargando) { <p class="loading">Cargando…</p> }
+
+  @if (!cargando) {
+    <div class="card">
+      <table>
+        <colgroup>
+          <col style="width:22%"><col style="width:22%"><col style="width:18%">
+          <col style="width:10%"><col style="width:28%">
+        </colgroup>
+        <thead><tr>
+          <th>Nombre</th><th>Email</th><th>Empresa</th>
+          <th>Estado</th><th class="tar">Acciones</th>
+        </tr></thead>
+        <tbody>
+          @if (clientes.length === 0) {
+            <tr><td colspan="5"><div class="empty">Sin clientes · <a routerLink="/clientes/nuevo">Crear →</a></div></td></tr>
+          }
+          @for (c of clientes; track c.id) {
+            <tr>
+              <td class="fw">{{ c.nombre }}</td>
+              <td class="mu">{{ c.email }}</td>
+              <td class="mu">{{ c.empresa?.nombre || '—' }}</td>
+              <td><span class="badge b-{{ c.estado }}">{{ c.estado }}</span></td>
+              <td class="tar">
+                <div class="acts">
+                  <a [routerLink]="['/clientes', c.id]" class="ab av">Ver</a>
+                  <a [routerLink]="['/clientes/editar', c.id]" class="ab ae">Editar</a>
+                  <a [routerLink]="['/chat/cliente', c.id]" class="ab ae">💬 Chat</a>
+                  <button (click)="eliminarCliente(c.id)" class="ab ad">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

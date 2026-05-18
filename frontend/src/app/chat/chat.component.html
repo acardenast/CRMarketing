@@ -1,0 +1,53 @@
+<div class="pw">
+  <div class="ph">
+    <div>
+      <h1 class="pt">Chat</h1>
+      <p class="ps">Conversación de la acción #{{ accionId }}</p>
+    </div>
+    <a routerLink="/acciones" class="ab ae">← Volver</a>
+  </div>
+
+  @if (cargando) { <p class="loading">Cargando mensajes…</p> }
+  @if (error)    { <p class="error-msg">{{ error }}</p> }
+
+  @if (!cargando) {
+    <div class="card chat-card">
+
+      <div class="chat-mensajes" #mensajesBox>
+        @if (mensajes.length === 0) {
+          <div class="empty">Sin mensajes todavía · sé el primero en escribir</div>
+        }
+        @for (msg of mensajes; track msg.id) {
+          <div class="burbuja-wrap" [class.mia]="esMio(msg)">
+            <div class="burbuja" [class.burbuja-mia]="esMio(msg)" [class.burbuja-suya]="!esMio(msg)">
+              <span class="burbuja-nombre">{{ nombreRemitente(msg) }}</span>
+              <p class="burbuja-texto">{{ msg.mensaje }}</p>
+              <span class="burbuja-hora">
+                {{ msg.created_at | date:'dd/MM HH:mm' }}
+                @if (esMio(msg)) { <span class="leido-tick">{{ msg.leido ? '✓✓' : '✓' }}</span> }
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="chat-input-area">
+        <textarea
+          class="chat-input"
+          [(ngModel)]="textoNuevo"
+          (keydown)="onKeyDown($event)"
+          placeholder="Escribe un mensaje… (Enter para enviar)"
+          rows="2"
+          [disabled]="enviando"
+        ></textarea>
+        <button class="chat-send" (click)="enviar()" [disabled]="enviando || !textoNuevo.trim()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22,2 15,22 11,13 2,9 22,2"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  }
+</div>

@@ -1,0 +1,50 @@
+<div class="pw">
+  <div class="ph">
+    <div>
+      <h1 class="pt">Empresas</h1>
+      <p class="ps">{{ empresas.length }} empresa(s) registrada(s)</p>
+    </div>
+    <a routerLink="/empresas/nueva" class="badd">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nueva empresa
+    </a>
+  </div>
+
+  @if (cargando) { <p class="loading">Cargando…</p> }
+
+  @if (!cargando) {
+    <div class="card">
+      <table>
+        <colgroup>
+          <col style="width:20%"><col style="width:26%"><col style="width:15%">
+          <col style="width:10%"><col style="width:10%"><col style="width:19%">
+        </colgroup>
+        <thead><tr>
+          <th>Nombre</th><th>Email</th><th>Teléfono</th>
+          <th>Plan</th><th>Estado</th><th class="tar">Acciones</th>
+        </tr></thead>
+        <tbody>
+          @if (empresas.length === 0) {
+            <tr><td colspan="6"><div class="empty">Sin empresas · <a routerLink="/empresas/nueva">Crear →</a></div></td></tr>
+          }
+          @for (e of empresas; track e.id) {
+            <tr>
+              <td class="fw">{{ e.nombre }}</td>
+              <td class="mu">{{ e.email }}</td>
+              <td class="mu">{{ e.telefono || '—' }}</td>
+              <td><span class="badge b-{{ e.plan }}">{{ e.plan }}</span></td>
+              <td><span class="badge" [class]="e.activa ? 'badge b-activa' : 'badge b-inactivo'">{{ e.activa ? 'Activa' : 'Inactiva' }}</span></td>
+              <td class="tar">
+                <div class="acts">
+                  <a [routerLink]="['/empresas', e.id]" class="ab av">Ver</a>
+                  <a [routerLink]="['/empresas/editar', e.id]" class="ab ae">Editar</a>
+                  <button (click)="eliminarEmpresa(e.id)" class="ab ad">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
