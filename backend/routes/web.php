@@ -1,10 +1,15 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect('/login');
+    return response()->json([
+        'app' => 'CRMarketing API',
+        'status' => 'online',
+        'base_url' => 'https://crmarketing.onrender.com/api'
+    ]);
 });
 
 Route::get('/test', function () {
-    return 'laravel ok';
+    return 'test backend';
 });
