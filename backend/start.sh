@@ -13,7 +13,6 @@ php artisan config:clear || true
 php artisan cache:clear || true
 
 php artisan migrate --force || true
-php artisan db:seed --force || true
 
 php artisan config:cache
 php artisan route:cache

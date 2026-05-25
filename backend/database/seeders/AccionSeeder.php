@@ -10,6 +10,9 @@ class AccionSeeder extends Seeder
 {
     public function run(): void
     {
+            \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            Accion::truncate();
+            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         // Notas
         Accion::create([
             'empresa_id' => 1,

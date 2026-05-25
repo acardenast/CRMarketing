@@ -16,28 +16,37 @@ class DashboardController extends Controller
         $user = $request->user();
 
         if ($user->rol === 'admin') {
-            $basico   = Empresa::where('plan', 'basico')->where('activa', true)->count();
-            $premium  = Empresa::where('plan', 'premium')->where('activa', true)->count();
+            $eid = $request->get('empresa_id');
+
+            $clientesQ = Cliente::query();
+            $accionesQ = Accion::query();
+            if ($eid) {
+                $clientesQ->where('empresa_id', $eid);
+                $accionesQ->where('empresa_id', $eid);
+            }
+
+            $basico  = Empresa::where('plan','basico')->where('activa',true)->count();
+            $premium = Empresa::where('plan','premium')->where('activa',true)->count();
             $mensualidades = ($basico * 100) + ($premium * 300);
-            $comisiones = Accion::where('tipo', 'campana')
-                ->where('estado_pago', 'pagado')
+            $comisiones = (clone $accionesQ)
+                ->where('tipo','campana')->where('estado_pago','pagado')
                 ->whereMonth('updated_at', now()->month)
                 ->whereYear('updated_at', now()->year)
                 ->sum('comision');
 
             return response()->json([
-                'total_empresas'      => Empresa::count(),
-                'empresas_activas'    => Empresa::where('activa', true)->count(),
-                'empresas_basico'     => $basico,
-                'empresas_premium'    => $premium,
-                'total_usuarios'      => User::count(),
-                'total_clientes'      => Cliente::count(),
-                'total_acciones'      => Accion::count(),
-                'acciones_hoy'        => Accion::whereDate('created_at', today())->count(),
-                'nuevos_esta_semana'  => Cliente::where('created_at', '>=', now()->startOfWeek())->count(),
-                'mensualidades'       => $mensualidades,
-                'comisiones_mes'      => round($comisiones, 2),
-                'total_ingresos_mes'  => round($mensualidades + $comisiones, 2),
+                'total_empresas'     => Empresa::count(),
+                'empresas_activas'   => Empresa::where('activa',true)->count(),
+                'empresas_basico'    => $basico,
+                'empresas_premium'   => $premium,
+                'total_usuarios'     => User::count(),
+                'total_clientes'     => $clientesQ->count(),
+                'total_acciones'     => $accionesQ->count(),
+                'acciones_hoy'       => (clone $accionesQ)->whereDate('created_at', today())->count(),
+                'nuevos_esta_semana' => (clone $clientesQ)->where('created_at','>=',now()->startOfWeek())->count(),
+                'mensualidades'      => $mensualidades,
+                'comisiones_mes'     => round($comisiones, 2),
+                'total_ingresos_mes' => round($mensualidades + $comisiones, 2),
             ]);
         }
 
