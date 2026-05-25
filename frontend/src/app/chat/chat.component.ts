@@ -93,6 +93,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
+  esAdmin(msg: Mensaje): boolean {
+  return msg.usuario?.rol === 'admin';
+  }
+  
   esMio(msg: Mensaje): boolean {
     const user = this.auth.user();
     if (!user) return false;
@@ -101,8 +105,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   nombreRemitente(msg: Mensaje): string {
-    if (msg.usuario_id === null) return msg.cliente?.nombre || 'Cliente';
-    return msg.usuario?.name || 'Empresa';
+  if (msg.usuario_id === null) return msg.cliente?.nombre || 'Cliente';
+  if (msg.usuario?.rol === 'admin') return '🛡️ Admin · ' + (msg.usuario?.name || 'Admin');
+  return msg.usuario?.name || 'Empresa';
   }
 
   scrollAbajo() {

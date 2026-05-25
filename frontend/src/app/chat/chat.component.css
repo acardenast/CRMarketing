@@ -120,3 +120,14 @@
   color: var(--color-error, #a12c7b);
   padding: 1rem;
 }
+
+.burbuja-admin {
+  background: #f0f4ff;
+  border: 1px solid #c7d2fe;
+  color: #3730a3;
+  align-self: center;
+  text-align: center;
+  font-size: .82rem;
+  border-radius: 8px;
+  opacity: .9;
+}
