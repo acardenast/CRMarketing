@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+
+declare const lucide: any;
 
 @Component({
   selector: 'app-sidebar',
@@ -10,7 +12,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent {
+export class SidebarComponent implements AfterViewInit {
   user: AuthService['user'];
   isAdmin:   AuthService['isAdmin'];
   isEmpresa: AuthService['isEmpresa'];
@@ -22,9 +24,13 @@ export class SidebarComponent {
     this.isEmpresa = auth.isEmpresa;
     this.isCliente = auth.isCliente;
 
-    // Restore theme on load
-    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null;
+    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('crm-theme') : null;
     if (saved) document.documentElement.setAttribute('data-theme', saved);
+  }
+
+  ngAfterViewInit(): void {
+    // Init Lucide icons after Angular renders the template
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   logout(): void { this.auth.logout(); }
@@ -35,6 +41,6 @@ export class SidebarComponent {
       (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
     const next = isDark ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
-    if (typeof localStorage !== 'undefined') localStorage.setItem('theme', next);
+    if (typeof localStorage !== 'undefined') localStorage.setItem('crm-theme', next);
   }
 }

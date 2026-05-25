@@ -1,70 +1,52 @@
 <header class="topnav" role="banner">
 
-  <!-- Left: Logo + nav links -->
   <div class="topnav-left">
-    <a routerLink="/dashboard" class="brand" aria-label="CRM Marketing — Inicio">
-      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect width="32" height="32" rx="7" fill="var(--text)" opacity=".06"/>
-        <path d="M7 23V13l9-6 9 6v10" stroke="var(--accent)" stroke-width="1.75" stroke-linejoin="round" fill="none"/>
-        <circle cx="16" cy="17.5" r="2.75" fill="var(--accent)"/>
+
+    <!-- Logo -->
+    <a routerLink="/dashboard" class="brand" aria-label="CRM Marketing">
+      <svg class="brand-mark" width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="5" fill="var(--accent)" opacity=".12"/>
+        <path d="M7 24V13.5L16 7.5l9 6V24" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+        <circle cx="16" cy="18" r="2.5" fill="var(--accent)"/>
       </svg>
-      <span class="brand-name">CRM</span>
+      <span class="brand-name">CRM<em>Marketing</em></span>
     </a>
 
-    <div class="nav-divider" aria-hidden="true"></div>
+    <div class="nav-sep" aria-hidden="true"></div>
 
-    <nav class="topnav-links" aria-label="Secciones principales">
+    <nav class="topnav-links" aria-label="Navegación principal">
 
       <a routerLink="/dashboard" routerLinkActive="active"
          [routerLinkActiveOptions]="{exact:true}" class="nav-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-          <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-          <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-          <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-          <rect x="14" y="14" width="7" height="7" rx="1.5"/>
-        </svg>
+        <i data-lucide="layout-dashboard" width="14" height="14"></i>
         Dashboard
       </a>
 
       @if (isAdmin() || isEmpresa()) {
         <a routerLink="/clientes" routerLinkActive="active" class="nav-link">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
+          <i data-lucide="users" width="14" height="14"></i>
           Clientes
         </a>
         <a routerLink="/acciones" routerLinkActive="active" class="nav-link">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-            <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>
-          </svg>
+          <i data-lucide="zap" width="14" height="14"></i>
           Acciones
         </a>
       }
 
       @if (isAdmin()) {
         <a routerLink="/empresas" routerLinkActive="active" class="nav-link">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9,22 9,12 15,12 15,22"/>
-          </svg>
+          <i data-lucide="building-2" width="14" height="14"></i>
           Empresas
         </a>
       }
 
       @if (isCliente()) {
         <a routerLink="/acciones" routerLinkActive="active" class="nav-link">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-            <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>
-          </svg>
+          <i data-lucide="zap" width="14" height="14"></i>
           Mis acciones
         </a>
         <a [routerLink]="['/chat/cliente', auth.user()?.cliente_id]" routerLinkActive="active" class="nav-link">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
+          <i data-lucide="message-square" width="14" height="14"></i>
           Chat
         </a>
       }
@@ -72,27 +54,21 @@
     </nav>
   </div>
 
-  <!-- Right: user + theme toggle -->
   <div class="topnav-right">
-    <button class="theme-btn" (click)="toggleTheme()" aria-label="Cambiar tema">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-        <circle cx="12" cy="12" r="5"/>
-        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-      </svg>
+    <button class="icon-btn" (click)="toggleTheme()" aria-label="Cambiar tema">
+      <i data-lucide="sun-moon" width="15" height="15"></i>
     </button>
 
     <div class="user-pill">
-      <div class="user-avatar" aria-hidden="true">{{ user()?.name?.charAt(0)?.toUpperCase() }}</div>
+      <div class="user-avatar" aria-hidden="true">
+        {{ user()?.name?.charAt(0)?.toUpperCase() }}
+      </div>
       <div class="user-meta">
         <span class="user-name">{{ user()?.name }}</span>
         <span class="user-role">{{ user()?.rol }}</span>
       </div>
-      <button class="logout-btn" (click)="logout()" aria-label="Cerrar sesión">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16,17 21,12 16,7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
+      <button class="icon-btn logout-btn" (click)="logout()" aria-label="Cerrar sesión">
+        <i data-lucide="log-out" width="14" height="14"></i>
       </button>
     </div>
   </div>

@@ -1,130 +1,108 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DashboardService } from '../services/dashboard.service';
 import { AuthService } from '../services/auth.service';
-import { ClienteService } from '../services/cliente.service';
+
+declare const lucide: any;
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, DatePipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, AfterViewInit {
   stats: any = null;
-  ultimasAcciones: any[] = [];
-  proximasAcciones: any[] = [];
-  clientesPorEstado: any[] = [];
-  empresasRecientes: any[] = [];
-  clientes: any[] = [];
   empresas: any[] = [];
-  clienteSeleccionado: number | null = null;
-  empresaSeleccionada: number | null = null;
-  cargando = true;
+  clientes: any[] = [];
+  empresasRecientes: any[] = [];
+  clientesPorEstado: any[] = [];
+  ultimasAcciones: any[] = [];
+  empresaSeleccionada: any = null;
+  clienteSeleccionado: any = null;
   today = new Date();
-  error = '';
 
-  isAdmin   = false;
-  isEmpresa = false;
-  isCliente = false;
+  get isAdmin()   { return this.auth.isAdmin(); }
+  get isEmpresa() { return this.auth.isEmpresa(); }
+  get isCliente() { return this.auth.isCliente(); }
 
   constructor(
     private dashboardService: DashboardService,
-    private clienteService: ClienteService,
     private auth: AuthService
   ) {}
 
-  ngOnInit() {
-    this.isAdmin   = this.auth.isAdmin();
-    this.isEmpresa = this.auth.isEmpresa();
-    this.isCliente = this.auth.isCliente();
-
-    if (this.isEmpresa) {
-      this.clienteService.getClientes().subscribe({
-        next: (data: any) => this.clientes = data,
-        error: () => {}
-      });
-    }
-    if (this.isAdmin) {
-      this.clienteService.getEmpresas().subscribe({
-        next: (data: any) => this.empresas = data,
-        error: () => {}
-      });
-    }
-    this.cargarDatos();
+  ngOnInit(): void    { this.cargarDatos(); }
+  ngAfterViewInit(): void {
+    setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 50);
   }
 
-  cargarDatos() {
-    const cid = this.clienteSeleccionado || undefined;
-    const eid = this.empresaSeleccionada || undefined;
+  cargarDatos(): void {
+    const params: any = {};
+    if (this.empresaSeleccionada) params.empresa_id = this.empresaSeleccionada;
+    if (this.clienteSeleccionado) params.cliente_id = this.clienteSeleccionado;
 
-    this.dashboardService.getStats(this.isAdmin ? eid : undefined).subscribe({
-    next: (data: any) => { this.stats = data; },
-    error: () => this.error = 'No se pudieron cargar las estadísticas'
+    this.dashboardService.getDashboard(params).subscribe((data: any) => {
+      this.stats             = data.stats;
+      this.empresas          = data.empresas          || [];
+      this.clientes          = data.clientes          || [];
+      this.empresasRecientes = data.empresas_recientes || [];
+      this.clientesPorEstado = data.clientes_por_estado || [];
+      this.ultimasAcciones   = data.ultimas_acciones  || [];
+      setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 0);
     });
-
-    if (this.isAdmin || this.isEmpresa) {
-      this.dashboardService.getUltimasAcciones(this.isAdmin ? undefined : cid, eid).subscribe({
-        next: (data: any) => this.ultimasAcciones = data,
-        error: () => {}
-      });
-    }
-
-    if (this.isAdmin) {
-      this.dashboardService.getEmpresasRecientes().subscribe({
-        next: (data: any) => { this.empresasRecientes = data; this.cargando = false; },
-        error: () => this.cargando = false
-      });
-    } else if (this.isEmpresa) {
-      this.dashboardService.getClientesPorEstado().subscribe({
-        next: (data: any) => { this.clientesPorEstado = data; this.cargando = false; },
-        error: () => this.cargando = false
-      });
-    } else if (this.isCliente) {
-      this.dashboardService.getProximasAcciones().subscribe({
-        next: (data: any) => { this.proximasAcciones = data; this.cargando = false; },
-        error: () => this.cargando = false
-      });
-    }
   }
 
-  filtrar() {
-    this.cargarDatos();
-  }
-
-  limpiarFiltro() {
-    this.clienteSeleccionado = null;
+  filtrar():      void { this.cargarDatos(); }
+  limpiarFiltro(): void {
     this.empresaSeleccionada = null;
+    this.clienteSeleccionado = null;
     this.cargarDatos();
   }
 
+  /* Lucide icon names por tipo de acción — reemplaza todos los emojis */
   getIconoTipo(tipo: string): string {
-    const map: any = { llamada:'📞', email:'📧', reunion:'🤝', propuesta:'📄', seguimiento:'🔔', nota:'📝', chat:'💬', campana:'📣' };
-    return map[tipo] || '⚡';
+    const map: Record<string, string> = {
+      llamada:     'phone',
+      email:       'mail',
+      reunion:     'calendar',
+      propuesta:   'file-text',
+      seguimiento: 'bell',
+      nota:        'pencil',
+      chat:        'message-square',
+      campana:     'megaphone'
+    };
+    return map[tipo] ?? 'activity';
   }
 
   getClaseEstado(estado: string): string {
-    const map: any = { pendiente:'est-pendiente', en_progreso:'est-progreso', completada:'est-completada', cancelada:'est-cancelada' };
-    return map[estado] || '';
+    const map: Record<string, string> = {
+      pendiente:   'est-pendiente',
+      en_progreso: 'est-progreso',
+      completada:  'est-completada',
+      cancelada:   'est-cancelada'
+    };
+    return map[estado] ?? '';
   }
 
   getClasePago(estado: string): string {
-    const map: any = { pendiente:'pago-pendiente', en_proceso:'pago-proceso', pagado:'pago-pagado' };
-    return map[estado] || '';
-  }
-
-  getNombreCliente(): string {
-    if (!this.clienteSeleccionado) return '';
-    const c = this.clientes.find((x: any) => x.id == this.clienteSeleccionado);
-    return c ? c.nombre : '';
+    const map: Record<string, string> = {
+      pendiente:  'pago-pendiente',
+      en_proceso: 'pago-proceso',
+      pagado:     'pago-pagado'
+    };
+    return map[estado] ?? '';
   }
 
   getNombreEmpresa(): string {
-    if (!this.empresaSeleccionada) return '';
     const e = this.empresas.find((x: any) => x.id == this.empresaSeleccionada);
     return e ? e.nombre : '';
+  }
+
+  getNombreCliente(): string {
+    const c = this.clientes.find((x: any) => x.id == this.clienteSeleccionado);
+    return c ? c.nombre : '';
   }
 }
