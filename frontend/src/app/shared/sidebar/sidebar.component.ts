@@ -21,7 +21,20 @@ export class SidebarComponent {
     this.isAdmin   = auth.isAdmin;
     this.isEmpresa = auth.isEmpresa;
     this.isCliente = auth.isCliente;
+
+    // Restore theme on load
+    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null;
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
   }
 
   logout(): void { this.auth.logout(); }
+
+  toggleTheme(): void {
+    const current = document.documentElement.getAttribute('data-theme');
+    const isDark = current === 'dark' ||
+      (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const next = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    if (typeof localStorage !== 'undefined') localStorage.setItem('theme', next);
+  }
 }
