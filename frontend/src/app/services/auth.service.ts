@@ -2,6 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/enviroment';
 
 export interface User {
   id: number;
@@ -19,15 +20,15 @@ export interface User {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly TOKEN_KEY = 'crm_token';
-  private readonly USER_KEY  = 'crm_user';
+  private readonly USER_KEY = 'crm_user';
 
   private _user = signal<User | null>(this.loadUser());
   private _token = signal<string | null>(localStorage.getItem(this.TOKEN_KEY));
 
-  readonly user    = this._user.asReadonly();
-  readonly token   = this._token.asReadonly();
-  readonly isAuth  = computed(() => !!this._token());
-  readonly isAdmin  = computed(() => this._user()?.rol === 'admin');
+  readonly user = this._user.asReadonly();
+  readonly token = this._token.asReadonly();
+  readonly isAuth = computed(() => !!this._token());
+  readonly isAdmin = computed(() => this._user()?.rol === 'admin');
   readonly isEmpresa = computed(() => this._user()?.rol === 'empresa');
   readonly isCliente = computed(() => this._user()?.rol === 'cliente');
 
@@ -41,19 +42,21 @@ export class AuthService {
   }
 
   login(login: string, password: string, rol: string): Observable<{ token: string; user: User }> {
-    return this.http.post<{ token: string; user: User }>('/api/auth/login', { login, password, rol })
-      .pipe(tap(res => {
-        localStorage.setItem(this.TOKEN_KEY, res.token);
-        localStorage.setItem(this.USER_KEY, JSON.stringify(res.user));
-        this._token.set(res.token);
-        this._user.set(res.user);
-      }));
+    return this.http.post<{ token: string; user: User }>(
+      `${environment.apiUrl}/auth/login`,
+      { login, password, rol }
+    ).pipe(tap(res => {
+      localStorage.setItem(this.TOKEN_KEY, res.token);
+      localStorage.setItem(this.USER_KEY, JSON.stringify(res.user));
+      this._token.set(res.token);
+      this._user.set(res.user);
+    }));
   }
 
   logout(): void {
     const token = this._token();
     if (token) {
-      this.http.post('/api/auth/logout', {}).subscribe({ error: () => {} });
+      this.http.post(`${environment.apiUrl}/auth/logout`, {}).subscribe({ error: () => {} });
     }
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
@@ -63,7 +66,7 @@ export class AuthService {
   }
 
   me(): Observable<User> {
-    return this.http.get<User>('/api/auth/me')
+    return this.http.get<User>(`${environment.apiUrl}/auth/me`)
       .pipe(tap(u => {
         this._user.set(u);
         localStorage.setItem(this.USER_KEY, JSON.stringify(u));

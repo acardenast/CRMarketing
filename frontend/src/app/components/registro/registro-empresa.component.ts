@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/enviroment';
 
 @Component({
   selector: 'app-registro-empresa',
@@ -17,7 +18,7 @@ export class RegistroEmpresaComponent {
     name: '', username: '', email: '', telefono: '',
     password: '', password_confirmation: ''
   };
-  error   = '';
+  error = '';
   loading = false;
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -25,7 +26,7 @@ export class RegistroEmpresaComponent {
   onSubmit(): void {
     this.loading = true;
     this.error = '';
-    this.http.post('/api/auth/register/empresa', this.form).subscribe({
+    this.http.post(`${environment.apiUrl}/auth/register/empresa`, this.form).subscribe({
       next: () => this.router.navigate(['/login']),
       error: (err) => {
         this.loading = false;

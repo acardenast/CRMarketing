@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/enviroment';
 
 interface Empresa { id: number; nombre: string; }
 
@@ -23,15 +24,15 @@ export class RegistroClienteComponent implements OnInit {
     empresa_cliente: '',
     password: '', password_confirmation: ''
   };
-  error   = '';
+  error = '';
   loading = false;
 
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
-    this.http.get<Empresa[]>('/api/public/empresas').subscribe({
+    this.http.get<Empresa[]>(`${environment.apiUrl}/public/empresas`).subscribe({
       next: (data) => { this.empresas = data; this.empresasCargando = false; },
-      error: ()    => { this.empresasCargando = false; }
+      error: () => { this.empresasCargando = false; }
     });
   }
 
@@ -39,7 +40,7 @@ export class RegistroClienteComponent implements OnInit {
     if (!this.form.empresa_id) { this.error = 'Selecciona una empresa.'; return; }
     this.loading = true;
     this.error = '';
-    this.http.post('/api/auth/register/cliente', this.form).subscribe({
+    this.http.post(`${environment.apiUrl}/auth/register/cliente`, this.form).subscribe({
       next: () => this.router.navigate(['/login']),
       error: (err) => {
         this.loading = false;
