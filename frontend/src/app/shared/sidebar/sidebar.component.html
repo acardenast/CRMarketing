@@ -1,76 +1,74 @@
 <header class="topnav" role="banner">
+  <div class="topnav-bar">
 
-  <div class="topnav-left">
-
-    <!-- Logo -->
-    <a routerLink="/dashboard" class="brand" aria-label="CRM Marketing">
-      <svg class="brand-mark" width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect width="32" height="32" rx="5" fill="var(--accent)" opacity=".12"/>
-        <path d="M7 24V13.5L16 7.5l9 6V24" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
-        <circle cx="16" cy="18" r="2.5" fill="var(--accent)"/>
-      </svg>
-      <span class="brand-name">CRM<em>Marketing</em></span>
-    </a>
-
-    <div class="nav-sep" aria-hidden="true"></div>
-
-    <nav class="topnav-links" aria-label="Navegación principal">
-
-      <a routerLink="/dashboard" routerLinkActive="active"
-         [routerLinkActiveOptions]="{exact:true}" class="nav-link">
-        <i data-lucide="layout-dashboard" width="14" height="14"></i>
-        Dashboard
+    <div class="topnav-left">
+      <a routerLink="/dashboard" class="brand" aria-label="CRM Marketing">
+        <svg class="brand-mark" width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M3.5 15.5V4.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+          <path d="M8.5 15.5V8" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+          <path d="M13.5 15.5V6.25" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+          <path d="M16.5 15.5V2.75" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+        </svg>
+        <span class="brand-name">CRM Marketing</span>
       </a>
 
-      @if (isAdmin() || isEmpresa()) {
-        <a routerLink="/clientes" routerLinkActive="active" class="nav-link">
-          <i data-lucide="users" width="14" height="14"></i>
-          Clientes
-        </a>
-        <a routerLink="/acciones" routerLinkActive="active" class="nav-link">
-          <i data-lucide="zap" width="14" height="14"></i>
-          Acciones
-        </a>
-      }
+      <nav class="topnav-links" aria-label="Navegación principal">
 
-      @if (isAdmin()) {
-        <a routerLink="/empresas" routerLinkActive="active" class="nav-link">
-          <i data-lucide="building-2" width="14" height="14"></i>
-          Empresas
+        <a routerLink="/dashboard" routerLinkActive="active"
+           [routerLinkActiveOptions]="{exact:true}" class="nav-link">
+          <i data-lucide="layout-dashboard" width="14" height="14"></i>
+          Dashboard
         </a>
-      }
 
-      @if (isCliente()) {
-        <a routerLink="/acciones" routerLinkActive="active" class="nav-link">
-          <i data-lucide="zap" width="14" height="14"></i>
-          Mis acciones
-        </a>
-        <a [routerLink]="['/chat/cliente', auth.user()?.cliente_id]" routerLinkActive="active" class="nav-link">
-          <i data-lucide="message-square" width="14" height="14"></i>
-          Chat
-        </a>
-      }
+        @if (isAdmin() || isEmpresa()) {
+          <a routerLink="/clientes" routerLinkActive="active" class="nav-link">
+            <i data-lucide="users" width="14" height="14"></i>
+            Clientes
+          </a>
+          <a routerLink="/acciones" routerLinkActive="active" class="nav-link">
+            <i data-lucide="activity" width="14" height="14"></i>
+            Acciones
+          </a>
+        }
 
-    </nav>
-  </div>
+        @if (isAdmin()) {
+          <a routerLink="/empresas" routerLinkActive="active" class="nav-link">
+            <i data-lucide="building-2" width="14" height="14"></i>
+            Empresas
+          </a>
+        }
 
-  <div class="topnav-right">
-    <button class="icon-btn" (click)="toggleTheme()" aria-label="Cambiar tema">
-      <i data-lucide="sun-moon" width="15" height="15"></i>
-    </button>
+        @if (isCliente()) {
+          <a routerLink="/acciones" routerLinkActive="active" class="nav-link">
+            <i data-lucide="activity" width="14" height="14"></i>
+            Mis acciones
+          </a>
+          <a [routerLink]="['/chat/cliente', auth.user()?.cliente_id]" routerLinkActive="active" class="nav-link">
+            <i data-lucide="message-square" width="14" height="14"></i>
+            Chat
+          </a>
+        }
 
-    <div class="user-pill">
-      <div class="user-avatar" aria-hidden="true">
-        {{ user()?.name?.charAt(0)?.toUpperCase() }}
+      </nav>
+    </div>
+
+    <div class="topnav-right">
+      <button class="icon-btn" (click)="toggleTheme()" [attr.aria-label]="themeLabel()">
+        <i [attr.data-lucide]="themeIcon()" width="15" height="15"></i>
+      </button>
+
+      <div class="user-block">
+        <div class="user-avatar" aria-hidden="true">{{ user()?.name?.charAt(0)?.toUpperCase() }}</div>
+        <div class="user-meta">
+          <span class="user-name">{{ user()?.name }}</span>
+          <span class="user-role">{{ user()?.rol }}</span>
+        </div>
       </div>
-      <div class="user-meta">
-        <span class="user-name">{{ user()?.name }}</span>
-        <span class="user-role">{{ user()?.rol }}</span>
-      </div>
+
       <button class="icon-btn logout-btn" (click)="logout()" aria-label="Cerrar sesión">
-        <i data-lucide="log-out" width="14" height="14"></i>
+        <i data-lucide="log-out" width="15" height="15"></i>
       </button>
     </div>
-  </div>
 
+  </div>
 </header>

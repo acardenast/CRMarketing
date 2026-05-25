@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -18,6 +18,8 @@ export class SidebarComponent implements AfterViewInit {
   isEmpresa: AuthService['isEmpresa'];
   isCliente: AuthService['isCliente'];
 
+  currentTheme: 'light' | 'dark' = 'light';
+
   constructor(public auth: AuthService) {
     this.user      = auth.user;
     this.isAdmin   = auth.isAdmin;
@@ -25,22 +27,31 @@ export class SidebarComponent implements AfterViewInit {
     this.isCliente = auth.isCliente;
 
     const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('crm-theme') : null;
-    if (saved) document.documentElement.setAttribute('data-theme', saved);
+    const prefersDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    this.currentTheme = (saved === 'dark' || saved === 'light') ? (saved as 'dark' | 'light') : (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', this.currentTheme);
   }
 
   ngAfterViewInit(): void {
-    // Init Lucide icons after Angular renders the template
     if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   logout(): void { this.auth.logout(); }
 
   toggleTheme(): void {
-    const current = document.documentElement.getAttribute('data-theme');
-    const isDark = current === 'dark' ||
-      (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    const next = isDark ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    if (typeof localStorage !== 'undefined') localStorage.setItem('crm-theme', next);
+    this.currentTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', this.currentTheme);
+    if (typeof localStorage !== 'undefined') localStorage.setItem('crm-theme', this.currentTheme);
+    queueMicrotask(() => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+  }
+
+  themeIcon(): string {
+    return this.currentTheme === 'dark' ? 'sun' : 'moon';
+  }
+
+  themeLabel(): string {
+    return this.currentTheme === 'dark' ? 'Activar tema claro' : 'Activar tema oscuro';
   }
 }
