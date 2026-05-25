@@ -61,9 +61,9 @@ export class DashboardComponent implements OnInit {
     const cid = this.clienteSeleccionado || undefined;
     const eid = this.empresaSeleccionada || undefined;
 
-    this.dashboardService.getStats().subscribe({
-      next: (data: any) => { this.stats = data; },
-      error: () => this.error = 'No se pudieron cargar las estadísticas'
+    this.dashboardService.getStats(this.isAdmin ? eid : undefined).subscribe({
+    next: (data: any) => { this.stats = data; },
+    error: () => this.error = 'No se pudieron cargar las estadísticas'
     });
 
     if (this.isAdmin || this.isEmpresa) {

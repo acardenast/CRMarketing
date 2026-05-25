@@ -68,6 +68,10 @@ export class ClientesDetalleComponent implements OnInit {
   }
 
   cambiarTab(tab: 'resumen' | 'acciones' | 'chat' | 'calendario') {
+    if (tab === 'chat') {
+      this.router.navigate(['/chat/cliente', this.cliente.id]);
+      return;
+    }
     this.tabActiva = tab;
     if (tab === 'calendario') this.generarCalendario();
   }

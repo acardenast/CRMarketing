@@ -6,7 +6,10 @@ import { ApiService } from './api.service';
 export class DashboardService {
   constructor(private api: ApiService) {}
 
-  getStats(): Observable<any> { return this.api.get('dashboard/stats'); }
+  getStats(empresaId?: number): Observable<any> {
+  const params = empresaId ? `?empresa_id=${empresaId}` : '';
+  return this.api.get(`dashboard/stats${params}`);
+  }
 
   getUltimasAcciones(clienteId?: number, empresaId?: number): Observable<any> {
     const params = new URLSearchParams();
