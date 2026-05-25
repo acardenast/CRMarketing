@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { DashboardService } from '../services/dashboard.service';
 import { AuthService } from '../services/auth.service';
 
@@ -40,18 +41,25 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   cargarDatos(): void {
-    const params: any = {};
-    if (this.empresaSeleccionada) params.empresa_id = this.empresaSeleccionada;
-    if (this.clienteSeleccionado) params.cliente_id = this.clienteSeleccionado;
+    const empresaId  = this.empresaSeleccionada  ? +this.empresaSeleccionada  : undefined;
+    const clienteId  = this.clienteSeleccionado  ? +this.clienteSeleccionado  : undefined;
 
-    this.dashboardService.getDashboard(params).subscribe((data: any) => {
-      this.stats             = data.stats;
-      this.empresas          = data.empresas          || [];
-      this.clientes          = data.clientes          || [];
-      this.empresasRecientes = data.empresas_recientes || [];
-      this.clientesPorEstado = data.clientes_por_estado || [];
-      this.ultimasAcciones   = data.ultimas_acciones  || [];
-      setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 0);
+    forkJoin({
+      stats:          this.dashboardService.getStats(empresaId),
+      acciones:       this.dashboardService.getUltimasAcciones(clienteId, empresaId),
+      porEstado:      this.dashboardService.getClientesPorEstado(),
+      recientes:      this.dashboardService.getEmpresasRecientes(),
+    }).subscribe({
+      next: (res: any) => {
+        this.stats             = res.stats;
+        this.empresas          = res.stats?.empresas          || [];
+        this.clientes          = res.stats?.clientes          || [];
+        this.empresasRecientes = res.recientes                || [];
+        this.clientesPorEstado = res.porEstado                || [];
+        this.ultimasAcciones   = res.acciones                 || [];
+        setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 0);
+      },
+      error: (err: any) => console.error('Dashboard error:', err)
     });
   }
 
@@ -62,7 +70,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.cargarDatos();
   }
 
-  /* Lucide icon names por tipo de acción — reemplaza todos los emojis */
   getIconoTipo(tipo: string): string {
     const map: Record<string, string> = {
       llamada:     'phone',
