@@ -1,56 +1,237 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* ── Hanken Grotesk (igual que el ejemplo de referencia) ── */
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
+/* ── Tokens: Light Mode ────────────────────────────────── */
 :root {
-  --bg-main: #f8fafc;
-  --bg-card: #ffffff;
-  --border-color: #e2e8f0;
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08);
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-success: #16a34a;
-  --color-danger: #dc2626;
-  --color-text: #0f172a;
-  --color-text-muted: #64748b;
-  --color-text-faint: #94a3b8;
-  --radius: 0.5rem;
-  --radius-lg: 0.75rem;
+  /* Superficies */
+  --bg:                    #f8f9ff;
+  --surface:               #ffffff;
+  --surface-container:     #e5eeff;
+  --surface-container-low: #eff4ff;
+  --surface-container-high:#dce9ff;
+  --surface-container-highest: #d3e4fe;
+  --surface-dim:           #cbdbf5;
+  --outline:               #6e7979;
+  --outline-variant:       #bdc9c8;
+
+  /* Texto */
+  --on-bg:                 #0b1c30;
+  --on-surface:            #0b1c30;
+  --on-surface-variant:    #3e4949;
+  --text-muted:            #6e7979;
+  --text-faint:            #bdc9c8;
+
+  /* Acento principal teal */
+  --primary:               #006565;
+  --primary-container:     #008080;
+  --on-primary:            #ffffff;
+  --on-primary-container:  #e3fffe;
+  --primary-fixed-dim:     #76d6d5;
+  --surface-tint:          #006a6a;
+  --inverse-primary:       #76d6d5;
+
+  /* Sidebar */
+  --sidebar-w:             240px;
+  --sidebar-bg:            var(--surface-container);
+  --sidebar-border:        var(--surface-container-high);
+  --sidebar-text:          var(--on-surface-variant);
+  --sidebar-active-bg:     var(--primary-container);
+  --sidebar-active-text:   var(--on-primary-container);
+  --sidebar-hover-bg:      var(--surface-container-highest);
+  --sidebar-hover-text:    var(--on-surface);
+
+  /* Estados */
+  --status-lead:           #F59E0B;
+  --status-negotiation:    #8B5CF6;
+  --status-client:         #10B981;
+  --status-error:          #DC2626;
+
+  /* Sombras */
+  --shadow-sm:  0 1px 3px rgba(11,28,48,.05);
+  --shadow-md:  0 4px 16px rgba(11,28,48,.09);
+  --shadow-lg:  0 10px 30px rgba(11,28,48,.12);
+
+  /* Radio */
+  --radius-sm:  0.25rem;
+  --radius:     0.5rem;
+  --radius-lg:  0.75rem;
+  --radius-xl:  1rem;
+  --radius-full:9999px;
+
+  /* Tipografía */
+  --font-body:  'Hanken Grotesk', -apple-system, sans-serif;
+  --font-size-xs:   12px;
+  --font-size-sm:   14px;
+  --font-size-base: 16px;
+  --font-size-lg:   18px;
+  --font-size-xl:   24px;
+  --font-size-2xl:  32px;
+  --font-size-3xl:  48px;
+
+  /* Easing */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:    cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast:      150ms var(--ease-out);
+  --t-normal:    220ms var(--ease-out);
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
+/* ── Tokens: Dark Mode ─────────────────────────────────── */
+[data-theme="dark"] {
+  --bg:                    #0d1117;
+  --surface:               #161b22;
+  --surface-container:     #1c2128;
+  --surface-container-low: #161b22;
+  --surface-container-high:#21262d;
+  --surface-container-highest: #2d333b;
+  --surface-dim:           #0d1117;
+  --outline:               #4a5568;
+  --outline-variant:       #2d333b;
+
+  --on-bg:                 #e6edf3;
+  --on-surface:            #e6edf3;
+  --on-surface-variant:    #8b949e;
+  --text-muted:            #6e7681;
+  --text-faint:            #484f58;
+
+  --primary:               #39d0d0;
+  --primary-container:     #0a5f5f;
+  --on-primary:            #0d1117;
+  --on-primary-container:  #aef7f6;
+  --surface-tint:          #39d0d0;
+
+  --sidebar-bg:            #13181f;
+  --sidebar-border:        #21262d;
+  --sidebar-text:          #8b949e;
+  --sidebar-active-bg:     #0a5f5f;
+  --sidebar-active-text:   #aef7f6;
+  --sidebar-hover-bg:      #21262d;
+  --sidebar-hover-text:    #e6edf3;
+
+  --status-lead:           #fbbf24;
+  --status-negotiation:    #a78bfa;
+  --status-client:         #34d399;
+  --status-error:          #f87171;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.3);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.4);
+  --shadow-lg:  0 10px 30px rgba(0,0,0,.5);
+}
+
+/* Media preference fallback */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg:                    #0d1117;
+    --surface:               #161b22;
+    --surface-container:     #1c2128;
+    --surface-container-low: #161b22;
+    --surface-container-high:#21262d;
+    --surface-container-highest: #2d333b;
+    --surface-dim:           #0d1117;
+    --outline:               #4a5568;
+    --outline-variant:       #2d333b;
+    --on-bg:                 #e6edf3;
+    --on-surface:            #e6edf3;
+    --on-surface-variant:    #8b949e;
+    --text-muted:            #6e7681;
+    --text-faint:            #484f58;
+    --primary:               #39d0d0;
+    --primary-container:     #0a5f5f;
+    --on-primary:            #0d1117;
+    --on-primary-container:  #aef7f6;
+    --sidebar-bg:            #13181f;
+    --sidebar-border:        #21262d;
+    --sidebar-text:          #8b949e;
+    --sidebar-active-bg:     #0a5f5f;
+    --sidebar-active-text:   #aef7f6;
+    --sidebar-hover-bg:      #21262d;
+    --sidebar-hover-text:    #e6edf3;
+    --shadow-sm:  0 1px 3px rgba(0,0,0,.3);
+    --shadow-md:  0 4px 16px rgba(0,0,0,.4);
+    --shadow-lg:  0 10px 30px rgba(0,0,0,.5);
+  }
+}
+
+/* ── Base ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 html, body {
   height: 100%;
-  margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 14px;
-  color: var(--color-text);
-  background-color: var(--bg-main);
-  -webkit-font-smoothing: antialiased;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--on-bg);
+  background-color: var(--bg);
 }
 
-body {
-  margin: 0;
-}
+body { margin: 0; }
 
-a {
+a { color: inherit; text-decoration: none; }
+
+img, svg { display: block; max-width: 100%; }
+
+input, button, select, textarea {
+  font: inherit;
   color: inherit;
 }
 
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+button { cursor: pointer; background: none; border: none; }
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
 }
 
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 999px;
+  background: var(--outline-variant);
+  border-radius: var(--radius-full);
+  &:hover { background: var(--outline); }
 }
 
+/* ── Utilidades globales ───────────────────────────────── */
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: var(--surface);
+  border: 1px solid var(--surface-container-high);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--t-normal), transform var(--t-normal);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.btn-transition {
+  transition: all var(--t-fast);
+}
+
+/* Animaciones de entrada */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.anim-fade-up { animation: fadeInUp 0.45s var(--ease-out) forwards; }
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

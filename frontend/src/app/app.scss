@@ -1,0 +1,19 @@
+.app-shell {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--bg);
+}
+
+.app-main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  padding: 2rem 2.5rem;
+  min-height: 100dvh;
+  background: var(--bg);
+  transition: background var(--t-normal);
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    padding: 4.5rem 1rem 1rem;
+  }
+}
