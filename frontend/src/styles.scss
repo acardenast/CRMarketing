@@ -1,123 +1,56 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Superficies — papel cálido */
-  --bg:              #f5f4f0;
-  --surface:         #fafaf7;
-  --surface-2:       #ffffff;
-  --surface-offset:  #edeae5;
-  --border:          rgba(40,37,29,.10);
-  --divider:         rgba(40,37,29,.07);
-
-  /* Texto */
-  --text:            #1a1916;
-  --text-muted:      #6b6a65;
-  --text-faint:      #a8a7a2;
-
-  /* Acento único */
-  --accent:          #01696f;
-  --accent-hover:    #0c4e54;
-  --accent-active:   #0f3638;
-  --accent-subtle:   rgba(1,105,111,.09);
-
-  /* Sidebar */
-  --sidebar-bg:      #18171480;
-  --sidebar-solid:   #181714;
-  --sidebar-border:  rgba(255,255,255,.07);
-  --sidebar-w:       216px;
-
-  /* Tipografía */
-  --font-display:    'Instrument Serif', Georgia, serif;
-  --font-body:       'Instrument Sans', -apple-system, sans-serif;
-
-  /* Escala fluida */
-  --text-xs:   clamp(0.72rem,  0.68rem + 0.2vw,  0.8rem);
-  --text-sm:   clamp(0.8rem,   0.75rem + 0.25vw, 0.875rem);
-  --text-base: clamp(0.875rem, 0.84rem + 0.18vw, 1rem);
-  --text-lg:   clamp(1rem,     0.9rem  + 0.5vw,  1.25rem);
-  --text-xl:   clamp(1.25rem,  1rem    + 1.25vw, 1.75rem);
-  --text-2xl:  clamp(1.6rem,   1.2rem  + 2vw,    2.5rem);
-
-  /* Espaciado 4px */
-  --s1: .25rem;  --s2: .5rem;   --s3: .75rem;  --s4: 1rem;
-  --s5: 1.25rem; --s6: 1.5rem;  --s8: 2rem;    --s10: 2.5rem;
-  --s12: 3rem;   --s16: 4rem;
-
-  /* Radios */
-  --r-sm: .375rem;
-  --r-md: .5rem;
-  --r-lg: .75rem;
-  --r-xl: 1rem;
-  --r-full: 9999px;
-
-  /* Sombras cálidas */
-  --shadow-sm: 0 1px 2px rgba(26,25,22,.06);
-  --shadow-md: 0 4px 12px rgba(26,25,22,.08);
-  --shadow-lg: 0 12px 32px rgba(26,25,22,.12);
-
-  /* Easing */
-  --ease-out: cubic-bezier(.23, 1, .32, 1);
-  --t-fast:   120ms cubic-bezier(.23, 1, .32, 1);
-  --t-normal: 180ms cubic-bezier(.23, 1, .32, 1);
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08);
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-text-faint: #94a3b8;
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
 }
 
-/* ── Base reset ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
+  color: var(--color-text);
+  background-color: var(--bg-main);
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
-  min-height: 100dvh;
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  color: var(--text);
-  background: var(--bg);
-  line-height: 1.6;
+  margin: 0;
 }
 
-a { color: inherit; text-decoration: none; }
-img, svg { display: block; max-width: 100%; }
-input, button, textarea, select { font: inherit; color: inherit; }
-
-/* Scrollbar discreta */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-thumb { background: var(--surface-offset); border-radius: var(--r-full); }
-
-/* Focus ring */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: var(--r-sm);
+a {
+  color: inherit;
 }
 
-/* Selección */
-::selection {
-  background: rgba(1,105,111,.18);
-  color: var(--text);
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
 
-/* ── Layout shell ── */
-.app-shell {
-  display: flex;
-  min-height: 100dvh;
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
 }
 
-.app-main {
-  flex: 1;
-  margin-left: var(--sidebar-w);
-  padding: var(--s8) var(--s10);
-  min-width: 0;
-}
-
-/* ── Card base ── */
 .card {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 }
