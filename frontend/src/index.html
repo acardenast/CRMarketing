@@ -1,26 +1,11 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>CRM Marketing</title>
+  <title>CrmFrontend</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <!-- Lucide icons — lightweight SVG icon library, replaces all emojis -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
-  <script>
-    // Init Lucide after DOM ready
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.lucide) lucide.createIcons();
-    });
-    // Re-init on route changes (Angular SPA)
-    const _lcObs = new MutationObserver(() => {
-      if (window.lucide) lucide.createIcons();
-    });
-    document.addEventListener('DOMContentLoaded', () => {
-      _lcObs.observe(document.body, { childList: true, subtree: true });
-    });
-  </script>
 </head>
 <body>
   <app-root></app-root>
