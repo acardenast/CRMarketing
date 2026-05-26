@@ -1,327 +1,322 @@
-<div class="dw">
-
-  <div class="dh">
-    <div>
-      <h1 class="dt">{{ isAdmin ? 'Panel de administración' : 'Dashboard' }}</h1>
-      <p class="ds">{{ today | date:'EEEE, d MMMM yyyy' }}</p>
-    </div>
-    @if (!isAdmin && !isCliente) {
-      <div style="display:flex;gap:.6rem;">
-        <a routerLink="/clientes/nuevo" class="badd">+ Nuevo cliente</a>
-        <a routerLink="/acciones/nueva" class="badd ghost">+ Nueva acción</a>
-      </div>
-    }
+<!-- Page Header -->
+<header class="dash-header">
+  <div>
+    <h2 class="dash-title">Panel Principal</h2>
+    <p class="dash-subtitle">
+      Visión general del rendimiento
+      <span class="dash-date">· {{ today | date:'d \"de\" MMMM \"de\" yyyy' : '' : 'es' }}</span>
+    </p>
   </div>
 
-  <!-- ── FILTRO ADMIN: por empresa ── -->
-  @if (isAdmin && empresas.length > 0) {
-    <div class="filtro-cliente-bar">
-      <span class="filtro-label">🔍 Filtrar por empresa:</span>
-      <select class="filtro-select" [(ngModel)]="empresaSeleccionada" (change)="filtrar()">
-        <option [ngValue]="null">Todas las empresas</option>
-        <option *ngFor="let e of empresas" [ngValue]="e.id">{{ e.nombre }}</option>
+  <!-- Filtros Admin -->
+  @if (isAdmin) {
+    <div class="filter-row">
+      <select class="filter-select" [(ngModel)]="empresaSeleccionada" (change)="filtrar()">
+        <option [value]="null">Todas las empresas</option>
+        @for (e of empresas; track e.id) {
+          <option [value]="e.id">{{ e.nombre }}</option>
+        }
       </select>
       @if (empresaSeleccionada) {
-        <span class="filtro-activo">Mostrando: <strong>{{ getNombreEmpresa() }}</strong></span>
-        <button class="filtro-clear" (click)="limpiarFiltro()">✕ Limpiar</button>
+        <button class="btn-ghost" (click)="limpiarFiltro()">Limpiar filtro</button>
       }
     </div>
   }
 
-  <!-- ── FILTRO EMPRESA: por cliente ── -->
-  @if (isEmpresa && clientes.length > 0) {
-    <div class="filtro-cliente-bar">
-      <span class="filtro-label">🔍 Filtrar por cliente:</span>
-      <select class="filtro-select" [(ngModel)]="clienteSeleccionado" (change)="filtrar()">
-        <option [ngValue]="null">Todos los clientes</option>
-        <option *ngFor="let c of clientes" [ngValue]="c.id">{{ c.nombre }}</option>
+  <!-- Filtros Empresa -->
+  @if (isEmpresa) {
+    <div class="filter-row">
+      <select class="filter-select" [(ngModel)]="clienteSeleccionado" (change)="filtrar()">
+        <option [value]="null">Todos los clientes</option>
+        @for (c of clientes; track c.id) {
+          <option [value]="c.id">{{ c.nombre }}</option>
+        }
       </select>
       @if (clienteSeleccionado) {
-        <span class="filtro-activo">Mostrando: <strong>{{ getNombreCliente() }}</strong></span>
-        <button class="filtro-clear" (click)="limpiarFiltro()">✕ Limpiar</button>
+        <button class="btn-ghost" (click)="limpiarFiltro()">Limpiar filtro</button>
       }
     </div>
   }
+</header>
 
-  <!-- ── ADMIN: KPIs del sistema ── -->
-  @if (isAdmin && stats) {
-    <div class="kgrid k4">
-      <div class="kcard">
-        <div class="kicon ki-blue">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-        </div>
-        <div>
-          <p class="kl">Empresas totales</p>
-          <p class="kv">{{ stats.total_empresas }}</p>
-          <p class="ks">{{ stats.empresas_activas }} activas</p>
-        </div>
-      </div>
-      <div class="kcard">
-        <div class="kicon ki-teal">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <div>
-          <p class="kl">Usuarios registrados</p>
-          <p class="kv">{{ stats.total_usuarios }}</p>
-        </div>
-      </div>
-      <div class="kcard">
-        <div class="kicon ki-green">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-        </div>
-        <div>
-          <p class="kl">Clientes totales</p>
-          <p class="kv">{{ stats.total_clientes }}</p>
-          <p class="ks">{{ stats.nuevos_esta_semana }} nuevos esta semana</p>
-        </div>
-      </div>
-      <div class="kcard">
-        <div class="kicon ki-purple">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg>
-        </div>
-        <div>
-          <p class="kl">Acciones totales</p>
-          <p class="kv">{{ stats.total_acciones }}</p>
-          <p class="ks">{{ stats.acciones_hoy }} hoy</p>
-        </div>
+<!-- Loading -->
+@if (cargando) {
+  <div class="loading-grid">
+    @for (i of [1,2,3,4]; track i) {
+      <div class="kcard skeleton"></div>
+    }
+  </div>
+}
+
+@if (!cargando) {
+
+<!-- ── KPI METRICS ──────────────────────────────────────────────────── -->
+@if (stats) {
+<section class="kgrid">
+
+  <!-- Total Clientes / Empresas -->
+  @if (isAdmin) {
+    <div class="kcard">
+      <span class="klabel">Total Empresas</span>
+      <div class="kv">{{ stats.total_empresas ?? '—' }}</div>
+      <div class="kdelta kd-up">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        Activas en el sistema
       </div>
     </div>
-
-    <div class="bgrid">
-      <div class="panel">
-        <div class="phead">
-          <span class="ptitle">Empresas recientes</span>
-          <a routerLink="/empresas" class="plink">Ver todas →</a>
-        </div>
-        <div class="pbody">
-          @for (e of empresasRecientes; track e.id) {
-            <div class="erow">
-              <div class="eavatar">{{ e.nombre.charAt(0).toUpperCase() }}</div>
-              <div class="einfo">
-                <p class="ename">{{ e.nombre }}</p>
-                <p class="emeta">{{ e.clientes_count }} clientes · {{ e.usuarios_count }} usuarios</p>
-              </div>
-              <span class="badge" [class]="e.activa ? 'b-activa' : 'b-inactivo'">{{ e.activa ? 'Activa' : 'Inactiva' }}</span>
-            </div>
-          }
-        </div>
-      </div>
-      <div class="panel">
-        <div class="phead">
-          <span class="ptitle">
-            Actividad reciente
-            @if (clienteSeleccionado) { <span class="filtro-chip">{{ getNombreCliente() }}</span> }
-          </span>
-          <a routerLink="/acciones" class="plink">Ver todas →</a>
-        </div>
-        <div class="pbody">
-          @if (ultimasAcciones.length === 0) {
-            <p class="vacio-lista">No hay acciones para este cliente.</p>
-          }
-          @for (a of ultimasAcciones; track a.id) {
-            <div class="arow">
-              <div class="aicon">{{ getIconoTipo(a.tipo) }}</div>
-              <div class="ainfo">
-                <p class="adesc">{{ a.titulo || a.descripcion }}</p>
-                <p class="ameta">{{ a.cliente?.nombre || '—' }} · {{ a.fecha_inicio | date:'dd/MM/yyyy' }}</p>
-              </div>
-              @if (a.tipo === 'campana' && a.precio) {
-                <span class="pago-badge" [ngClass]="getClasePago(a.estado_pago)">{{ a.estado_pago }}</span>
-              }
-            </div>
-          }
-        </div>
+    <div class="kcard">
+      <span class="klabel">Total Clientes</span>
+      <div class="kv">{{ stats.total_clientes ?? '—' }}</div>
+      <div class="kdelta kd-up">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        En todas las empresas
       </div>
     </div>
-
-    <div class="ingresos-section">
-      <div class="phead" style="padding:1rem 0 .75rem">
-        <span class="ptitle">💰 Ingresos del mes</span>
-        @if (clienteSeleccionado) { <span class="filtro-chip">{{ getNombreCliente() }}</span> }
+    <div class="kcard">
+      <span class="klabel">Acciones Pendientes</span>
+      <div class="kv">{{ stats.acciones_pendientes ?? '—' }}</div>
+      <div class="kdelta" [class.kd-warn]="(stats.acciones_pendientes ?? 0) > 0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Requieren atención
       </div>
-      <div class="kgrid k4" style="margin-bottom:0">
-        <div class="kcard">
-          <div class="kicon ki-blue"><span style="font-size:1.1rem">🏢</span></div>
-          <div>
-            <p class="kl">Mensualidades</p>
-            <p class="kv">{{ stats.mensualidades | number:'1.2-2' }}€</p>
-            <p class="ks">{{ stats.empresas_basico }} básico · {{ stats.empresas_premium }} premium</p>
+    </div>
+    <div class="kcard">
+      <span class="klabel">Ingresos Totales</span>
+      <div class="kv kv-money">{{ (stats.ingresos_totales ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</div>
+      <div class="kdelta kd-up">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        Acumulado
+      </div>
+    </div>
+  }
+
+  @if (isEmpresa) {
+    <div class="kcard">
+      <span class="klabel">Total Clientes</span>
+      <div class="kv">{{ stats.total_clientes ?? '—' }}</div>
+      <div class="kdelta kd-up">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        Registrados
+      </div>
+    </div>
+    <div class="kcard">
+      <span class="klabel">Acciones Pendientes</span>
+      <div class="kv">{{ stats.acciones_pendientes ?? '—' }}</div>
+      <div class="kdelta" [class.kd-warn]="(stats.acciones_pendientes ?? 0) > 0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Sin completar
+      </div>
+    </div>
+    <div class="kcard">
+      <span class="klabel">Ingresos Facturados</span>
+      <div class="kv kv-money">{{ (stats.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</div>
+      <div class="kdelta kd-up">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        Cobrado
+      </div>
+    </div>
+    <div class="kcard">
+      <span class="klabel">Ingresos Pendientes</span>
+      <div class="kv kv-money kv-warn">{{ (stats.ingresos_pendientes ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</div>
+      <div class="kdelta kd-warn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Por cobrar
+      </div>
+    </div>
+  }
+
+  @if (isCliente) {
+    <div class="kcard">
+      <span class="klabel">Próximas Acciones</span>
+      <div class="kv">{{ proximasAcciones.length }}</div>
+      <div class="kdelta">Programadas</div>
+    </div>
+    <div class="kcard">
+      <span class="klabel">Total a Pagar</span>
+      <div class="kv kv-money">{{ (stats.total_a_pagar ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</div>
+      <div class="kdelta" [class.kd-warn]="(stats.total_a_pagar ?? 0) > 0">Pendiente</div>
+    </div>
+  }
+
+</section>
+}
+
+<!-- ── GRID CENTRAL 8/4 ────────────────────────────────────────────── -->
+<section class="mid-grid">
+
+  <!-- ── Clientes por Estado (Empresa) ── -->
+  @if (isEmpresa && clientesPorEstado.length) {
+  <div class="chart-card">
+    <div class="card-header">
+      <h3 class="card-title">Distribución de Clientes por Estado</h3>
+    </div>
+    <div class="bar-chart">
+      @for (item of clientesPorEstado; track item.estado) {
+        <div class="bar-row">
+          <span class="bar-label">{{ item.estado }}</span>
+          <div class="bar-track">
+            <div class="bar-fill" [style.width.%]="item.porcentaje ?? (item.total / (stats?.total_clientes || 1) * 100)"
+                 [attr.data-estado]="item.estado"></div>
+          </div>
+          <span class="bar-count">{{ item.total }}</span>
+        </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- ── Empresas Recientes (Admin) ── -->
+  @if (isAdmin && empresasRecientes.length) {
+  <div class="chart-card">
+    <div class="card-header">
+      <h3 class="card-title">Empresas Recientes</h3>
+      <a routerLink="/empresas" class="card-link">Ver todas
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Empresa</th>
+          <th class="text-right">Clientes</th>
+          <th class="text-right">Ingresos</th>
+          <th class="text-right">Pendiente</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (e of empresasRecientes; track e.id) {
+          <tr>
+            <td class="td-name">{{ e.nombre }}</td>
+            <td class="text-right">{{ e.total_clientes ?? '—' }}</td>
+            <td class="text-right td-green">{{ (e.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
+            <td class="text-right td-warn">{{ (e.ingresos_pendientes ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
+
+  <!-- ── Próximas Acciones (Cliente) ── -->
+  @if (isCliente && proximasAcciones.length) {
+  <div class="chart-card">
+    <div class="card-header">
+      <h3 class="card-title">Próximas Acciones</h3>
+    </div>
+    <div class="action-list">
+      @for (a of proximasAcciones; track a.id) {
+        <div class="action-item">
+          <span class="action-icon">{{ getIconoTipo(a.tipo) }}</span>
+          <div class="action-body">
+            <p class="action-title">{{ a.descripcion }}</p>
+            <span class="action-meta">{{ a.fecha_programada | date:'d MMM' : '' : 'es' }}</span>
+          </div>
+          <span class="badge" [ngClass]="getClaseEstado(a.estado)">{{ a.estado }}</span>
+        </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- ── Actividad Reciente (Admin/Empresa) ── -->
+  @if ((isAdmin || isEmpresa) && ultimasAcciones.length) {
+  <div class="feed-card">
+    <div class="card-header">
+      <h3 class="card-title">Actividad Reciente</h3>
+      <a routerLink="/acciones" class="card-link">Ver todo
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+    <div class="feed">
+      @for (a of ultimasAcciones.slice(0, 6); track a.id) {
+        <div class="feed-item">
+          <div class="feed-dot" [ngClass]="'dot-' + a.estado"></div>
+          <div class="feed-body">
+            <p class="feed-text">
+              <span class="feed-icon">{{ getIconoTipo(a.tipo) }}</span>
+              {{ a.descripcion }}
+              @if (a.cliente_nombre) { <strong>{{ a.cliente_nombre }}</strong> }
+            </p>
+            <span class="feed-time">{{ a.fecha_programada | date:'d MMM · HH:mm' : '' : 'es' }}</span>
           </div>
         </div>
-        <div class="kcard">
-          <div class="kicon ki-orange"><span style="font-size:1.1rem">📣</span></div>
-          <div><p class="kl">Comisiones campañas</p><p class="kv">{{ stats.comisiones_mes | number:'1.2-2' }}€</p></div>
-        </div>
-        <div class="kcard" style="border:2px solid #01696f">
-          <div class="kicon ki-teal"><span style="font-size:1.1rem">💵</span></div>
-          <div><p class="kl">Total ingresos mes</p><p class="kv" style="color:#01696f">{{ stats.total_ingresos_mes | number:'1.2-2' }}€</p></div>
-        </div>
-      </div>
+      }
     </div>
+  </div>
   }
 
-  @if (isEmpresa && stats) {
-    <div class="kgrid k4">
-      <div class="kcard">
-        <div class="kicon ki-teal">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-        </div>
-        <div><p class="kl">Clientes totales</p><p class="kv">{{ stats.total_clientes }}</p></div>
-      </div>
-      <div class="kcard">
-        <div class="kicon ki-green">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>
-        </div>
-        <div><p class="kl">Clientes activos</p><p class="kv">{{ stats.clientes_activos }}</p></div>
-      </div>
-      <div class="kcard">
-        <div class="kicon ki-orange">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        </div>
-        <div><p class="kl">Leads</p><p class="kv">{{ stats.leads }}</p></div>
-      </div>
-      <div class="kcard">
-        <div class="kicon ki-purple">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg>
-        </div>
-        <div><p class="kl">Acciones</p><p class="kv">{{ stats.total_acciones }}</p><p class="ks">{{ stats.acciones_pendientes }} pendientes</p></div>
-      </div>
-    </div>
+</section>
 
-    <div class="bgrid">
-      <div class="panel">
-        <div class="phead"><span class="ptitle">Clientes por estado</span></div>
-        <div class="pbody">
-          @for (item of clientesPorEstado; track item.estado) {
-            <div class="srow">
-              <div class="sdot dot-{{ item.estado }}"></div>
-              <span class="slabel">{{ item.estado }}</span>
-              <div class="sbar-w"><div class="sbar bar-{{ item.estado }}" [style.width.%]="(item.total/stats.total_clientes)*100"></div></div>
-              <span class="scount">{{ item.total }}</span>
-            </div>
-          }
-        </div>
-      </div>
-      <div class="panel">
-        <div class="phead">
-          <span class="ptitle">
-            Últimas acciones
-            @if (clienteSeleccionado) { <span class="filtro-chip">{{ getNombreCliente() }}</span> }
-          </span>
-          <a routerLink="/acciones" class="plink">Ver todas →</a>
-        </div>
-        <div class="pbody">
-          @if (ultimasAcciones.length === 0) {
-            <p class="vacio-lista">No hay acciones para este cliente.</p>
-          }
-          @for (a of ultimasAcciones; track a.id) {
-            <div class="arow">
-              <div class="aicon">{{ getIconoTipo(a.tipo) }}</div>
-              <div class="ainfo">
-                <p class="adesc">{{ a.titulo || a.descripcion }}</p>
-                <p class="ameta">{{ a.cliente?.nombre }} · {{ a.fecha_inicio | date:'dd/MM/yyyy' }}</p>
-              </div>
-              @if (a.tipo === 'campana' && a.precio) {
-                <span class="pago-badge" [ngClass]="getClasePago(a.estado_pago)">{{ a.estado_pago }}</span>
-              }
-            </div>
-          }
-        </div>
-      </div>
-    </div>
+<!-- ── TABLA CAMPAÑAS / PAGOS ──────────────────────────────────────── -->
+@if (isEmpresa && stats) {
+<section class="table-section">
+  <div class="card-header">
+    <h3 class="card-title">Resumen Financiero</h3>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table data-table--full">
+      <thead>
+        <tr>
+          <th>Concepto</th>
+          <th class="text-right">Ingresos Netos</th>
+          <th class="text-right">Facturado</th>
+          <th class="text-right">Pendiente</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-name">Total acumulado</td>
+          <td class="text-right">{{ ((stats.ingresos_facturados ?? 0) + (stats.ingresos_pendientes ?? 0)) | currency:'EUR':'symbol':'1.0-0' }}</td>
+          <td class="text-right td-green">{{ (stats.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
+          <td class="text-right td-warn">{{ (stats.ingresos_pendientes ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+}
 
-    <div class="ingresos-section">
-      <div class="phead" style="padding:1rem 0 .75rem">
-        <span class="ptitle">💰 Mis ingresos por campañas</span>
-        <span class="ks" style="font-size:.75rem">Plan {{ stats.plan }} · {{ stats.porcentaje_crm }}% comisión CRM</span>
-        @if (clienteSeleccionado) { <span class="filtro-chip">{{ getNombreCliente() }}</span> }
-      </div>
-      <div class="kgrid k4" style="margin-bottom:0">
-        <div class="kcard">
-          <div class="kicon ki-green"><span style="font-size:1.1rem">✅</span></div>
-          <div><p class="kl">Ingresos netos cobrados</p><p class="kv" style="color:#16a34a">{{ stats.ingresos_netos | number:'1.2-2' }}€</p></div>
-        </div>
-        <div class="kcard">
-          <div class="kicon ki-orange"><span style="font-size:1.1rem">📤</span></div>
-          <div><p class="kl">Pagado al CRM</p><p class="kv">{{ stats.comisiones_pagadas | number:'1.2-2' }}€</p></div>
-        </div>
-        <div class="kcard">
-          <div class="kicon ki-purple"><span style="font-size:1.1rem">⏳</span></div>
-          <div><p class="kl">Pendiente de cobro</p><p class="kv">{{ stats.campanas_pendientes_cobro | number:'1.2-2' }}€</p></div>
-        </div>
-      </div>
-    </div>
-  }
+@if (isAdmin && empresasRecientes.length) {
+<section class="table-section">
+  <div class="card-header">
+    <h3 class="card-title">Rendimiento por Empresa</h3>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table data-table--full">
+      <thead>
+        <tr>
+          <th>Empresa</th>
+          <th class="text-right">Clientes</th>
+          <th class="text-right">Facturado</th>
+          <th class="text-right">Pendiente</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (e of empresasRecientes; track e.id) {
+          <tr>
+            <td class="td-name">{{ e.nombre }}</td>
+            <td class="text-right">{{ e.total_clientes ?? '—' }}</td>
+            <td class="text-right td-green">{{ (e.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
+            <td class="text-right td-warn">{{ (e.ingresos_pendientes ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr class="tfoot-row">
+          <td>Total</td>
+          <td class="text-right">{{ stats?.total_clientes ?? '—' }}</td>
+          <td class="text-right td-green">{{ (stats?.ingresos_totales ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
+          <td class="text-right td-warn">—</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</section>
+}
 
-  @if (isCliente && stats) {
-    <div class="kgrid k4">
-      <div class="kcard">
-        <div class="kicon ki-teal">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg>
-        </div>
-        <div><p class="kl">Mis acciones</p><p class="kv">{{ stats.total_acciones }}</p></div>
-      </div>
-      <div class="kcard">
-        <div class="kicon ki-orange">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        </div>
-        <div><p class="kl">Pendientes</p><p class="kv">{{ stats.acciones_pendientes }}</p></div>
-      </div>
-      <div class="kcard">
-        <div class="kicon ki-green">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>
-        </div>
-        <div><p class="kl">Completadas</p><p class="kv">{{ stats.acciones_completadas }}</p></div>
-      </div>
-      <div class="kcard">
-        <div class="kicon ki-blue">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        </div>
-        <div>
-          <p class="kl">Próxima acción</p>
-          <p class="kv" style="font-size:1rem">{{ stats.proxima_accion ? (stats.proxima_accion.fecha_inicio | date:'dd/MM') : '—' }}</p>
-        </div>
-      </div>
-    </div>
+<!-- Error -->
+@if (error) {
+  <div class="error-banner">{{ error }}</div>
+}
 
-    <div class="bgrid">
-      <div class="panel" style="grid-column:1/-1">
-        <div class="phead"><span class="ptitle">📅 Mis próximas acciones</span></div>
-        <div class="pbody">
-          @if (proximasAcciones.length === 0) {
-            <p class="vacio-lista">No tienes acciones pendientes próximas.</p>
-          }
-          @for (a of proximasAcciones; track a.id) {
-            <div class="arow">
-              <div class="aicon">{{ getIconoTipo(a.tipo) }}</div>
-              <div class="ainfo" style="flex:1">
-                <p class="adesc">{{ a.titulo || a.descripcion }}</p>
-                <p class="ameta">{{ a.fecha_inicio | date:'dd/MM/yyyy HH:mm' }}</p>
-              </div>
-              <span class="est-badge" [ngClass]="getClaseEstado(a.estado)">{{ a.estado }}</span>
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-
-    <div class="ingresos-section">
-      <div class="phead" style="padding:1rem 0 .75rem"><span class="ptitle">💳 Mis gastos en campañas</span></div>
-      <div class="kgrid k4" style="margin-bottom:0">
-        <div class="kcard">
-          <div class="kicon ki-green"><span style="font-size:1.1rem">✅</span></div>
-          <div><p class="kl">Total pagado</p><p class="kv" style="color:#16a34a">{{ stats.total_gastado | number:'1.2-2' }}€</p></div>
-        </div>
-        <div class="kcard">
-          <div class="kicon ki-orange"><span style="font-size:1.1rem">🔄</span></div>
-          <div><p class="kl">En proceso</p><p class="kv">{{ stats.total_en_proceso | number:'1.2-2' }}€</p></div>
-        </div>
-        <div class="kcard">
-          <div class="kicon ki-purple"><span style="font-size:1.1rem">⏳</span></div>
-          <div><p class="kl">Pendiente</p><p class="kv">{{ stats.total_pendiente | number:'1.2-2' }}€</p></div>
-        </div>
-      </div>
-    </div>
-  }
-
-</div>
+} <!-- end !cargando -->
