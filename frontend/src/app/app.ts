@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
+import { AuthService } from './services/auth.service';
 import { filter } from 'rxjs/operators';
 
 const PUBLIC_ROUTES = ['/login', '/registro'];
@@ -12,16 +13,24 @@ const PUBLIC_ROUTES = ['/login', '/registro'];
   imports: [RouterOutlet, CommonModule, SidebarComponent],
   templateUrl: './app.html'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'CRM';
   showSidebar = signal(false);
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private auth: AuthService) {
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe((e: NavigationEnd) => {
         const isPublic = PUBLIC_ROUTES.some(p => e.urlAfterRedirects.startsWith(p));
         this.showSidebar.set(!isPublic);
       });
+  }
+
+  ngOnInit(): void {
+    if (this.auth.isAuth()) {
+      this.auth.me().subscribe({
+        error: () => this.auth.logout()
+      });
+    }
   }
 }
