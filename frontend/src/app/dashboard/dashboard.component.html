@@ -7,14 +7,8 @@
     </div>
     @if (!isAdmin && !isCliente) {
       <div class="dh-actions">
-        <a routerLink="/clientes/nuevo" class="btn-add">
-          <i data-lucide="user-plus" width="13" height="13"></i>
-          Nuevo cliente
-        </a>
-        <a routerLink="/acciones/nueva" class="btn-add ghost">
-          <i data-lucide="plus" width="13" height="13"></i>
-          Nueva acción
-        </a>
+        <a routerLink="/clientes/nuevo" class="btn-add">+ Nuevo cliente</a>
+        <a routerLink="/acciones/nueva" class="btn-add ghost">+ Nueva acción</a>
       </div>
     }
   </div>
@@ -22,17 +16,14 @@
   <!-- Filtro admin -->
   @if (isAdmin && empresas.length > 0) {
     <div class="filtro-cliente-bar">
-      <span class="filtro-label">Empresa</span>
+      <span class="filtro-label">🔍 Empresa:</span>
       <select class="filtro-select" [(ngModel)]="empresaSeleccionada" (change)="filtrar()">
         <option [ngValue]="null">Todas</option>
         <option *ngFor="let e of empresas" [ngValue]="e.id">{{ e.nombre }}</option>
       </select>
       @if (empresaSeleccionada) {
         <span class="filtro-activo">{{ getNombreEmpresa() }}</span>
-        <button class="filtro-clear" (click)="limpiarFiltro()">
-          <i data-lucide="x" width="11" height="11"></i>
-          Limpiar
-        </button>
+        <button class="filtro-clear" (click)="limpiarFiltro()">✕ Limpiar</button>
       }
     </div>
   }
@@ -40,17 +31,14 @@
   <!-- Filtro empresa -->
   @if (isEmpresa && clientes.length > 0) {
     <div class="filtro-cliente-bar">
-      <span class="filtro-label">Cliente</span>
+      <span class="filtro-label">🔍 Cliente:</span>
       <select class="filtro-select" [(ngModel)]="clienteSeleccionado" (change)="filtrar()">
         <option [ngValue]="null">Todos</option>
         <option *ngFor="let c of clientes" [ngValue]="c.id">{{ c.nombre }}</option>
       </select>
       @if (clienteSeleccionado) {
         <span class="filtro-activo">{{ getNombreCliente() }}</span>
-        <button class="filtro-clear" (click)="limpiarFiltro()">
-          <i data-lucide="x" width="11" height="11"></i>
-          Limpiar
-        </button>
+        <button class="filtro-clear" (click)="limpiarFiltro()">✕ Limpiar</button>
       }
     </div>
   }
@@ -59,9 +47,6 @@
   @if (isAdmin && stats) {
     <div class="kgrid k4">
       <div class="kcard">
-        <div class="kicon">
-          <i data-lucide="building-2" width="18" height="18"></i>
-        </div>
         <div class="kbody">
           <p class="kl">Empresas</p>
           <p class="kv">{{ stats.total_empresas }}</p>
@@ -69,18 +54,12 @@
         </div>
       </div>
       <div class="kcard">
-        <div class="kicon">
-          <i data-lucide="users" width="18" height="18"></i>
-        </div>
         <div class="kbody">
           <p class="kl">Usuarios</p>
           <p class="kv">{{ stats.total_usuarios }}</p>
         </div>
       </div>
       <div class="kcard">
-        <div class="kicon">
-          <i data-lucide="user" width="18" height="18"></i>
-        </div>
         <div class="kbody">
           <p class="kl">Clientes</p>
           <p class="kv">{{ stats.total_clientes }}</p>
@@ -88,9 +67,6 @@
         </div>
       </div>
       <div class="kcard">
-        <div class="kicon">
-          <i data-lucide="zap" width="18" height="18"></i>
-        </div>
         <div class="kbody">
           <p class="kl">Acciones</p>
           <p class="kv">{{ stats.total_acciones }}</p>
@@ -121,10 +97,7 @@
 
       <div class="panel">
         <div class="phead">
-          <span class="ptitle">
-            Actividad reciente
-            @if (clienteSeleccionado) { <span class="filtro-chip">{{ getNombreCliente() }}</span> }
-          </span>
+          <span class="ptitle">Actividad reciente</span>
           <a routerLink="/acciones" class="plink">Ver todas</a>
         </div>
         <div class="pbody">
@@ -133,9 +106,7 @@
           }
           @for (a of ultimasAcciones; track a.id) {
             <div class="arow">
-              <div class="aicon">
-                <i [attr.data-lucide]="getIconoTipo(a.tipo)" width="14" height="14"></i>
-              </div>
+              <div class="aicon">{{ getIconoTipo(a.tipo) }}</div>
               <div class="ainfo">
                 <p class="adesc">{{ a.titulo || a.descripcion }}</p>
                 <p class="ameta">{{ a.cliente?.nombre || '—' }} · {{ a.fecha_inicio | date:'dd/MM/yyyy' }}</p>
@@ -153,11 +124,9 @@
     <div class="ingresos-section">
       <div class="phead" style="padding: var(--sp-6) 0 var(--sp-4)">
         <span class="ptitle">Ingresos del mes</span>
-        @if (clienteSeleccionado) { <span class="filtro-chip">{{ getNombreCliente() }}</span> }
       </div>
       <div class="kgrid k3">
         <div class="kcard">
-          <div class="kicon"><i data-lucide="credit-card" width="18" height="18"></i></div>
           <div class="kbody">
             <p class="kl">Mensualidades</p>
             <p class="kv">{{ stats.mensualidades | number:'1.2-2' }} €</p>
@@ -165,14 +134,12 @@
           </div>
         </div>
         <div class="kcard">
-          <div class="kicon"><i data-lucide="megaphone" width="18" height="18"></i></div>
           <div class="kbody">
             <p class="kl">Comisiones</p>
             <p class="kv">{{ stats.comisiones_mes | number:'1.2-2' }} €</p>
           </div>
         </div>
         <div class="kcard kcard-accent">
-          <div class="kicon"><i data-lucide="trending-up" width="18" height="18"></i></div>
           <div class="kbody">
             <p class="kl">Total mes</p>
             <p class="kv">{{ stats.total_ingresos_mes | number:'1.2-2' }} €</p>
@@ -186,19 +153,15 @@
   @if (isEmpresa && stats) {
     <div class="kgrid k4">
       <div class="kcard">
-        <div class="kicon"><i data-lucide="users" width="18" height="18"></i></div>
         <div class="kbody"><p class="kl">Clientes totales</p><p class="kv">{{ stats.total_clientes }}</p></div>
       </div>
       <div class="kcard">
-        <div class="kicon"><i data-lucide="user-check" width="18" height="18"></i></div>
         <div class="kbody"><p class="kl">Clientes activos</p><p class="kv">{{ stats.clientes_activos }}</p></div>
       </div>
       <div class="kcard">
-        <div class="kicon"><i data-lucide="signal" width="18" height="18"></i></div>
         <div class="kbody"><p class="kl">Leads</p><p class="kv">{{ stats.leads }}</p></div>
       </div>
       <div class="kcard">
-        <div class="kicon"><i data-lucide="zap" width="18" height="18"></i></div>
         <div class="kbody">
           <p class="kl">Acciones</p>
           <p class="kv">{{ stats.total_acciones }}</p>
@@ -236,9 +199,7 @@
           }
           @for (a of ultimasAcciones; track a.id) {
             <div class="arow">
-              <div class="aicon">
-                <i [attr.data-lucide]="getIconoTipo(a.tipo)" width="14" height="14"></i>
-              </div>
+              <div class="aicon">{{ getIconoTipo(a.tipo) }}</div>
               <div class="ainfo">
                 <p class="adesc">{{ a.titulo || a.descripcion }}</p>
                 <p class="ameta">{{ a.cliente?.nombre || '—' }} · {{ a.fecha_inicio | date:'dd/MM/yyyy' }}</p>
@@ -257,16 +218,13 @@
   @if (isCliente && stats) {
     <div class="kgrid k3">
       <div class="kcard">
-        <div class="kicon"><i data-lucide="zap" width="18" height="18"></i></div>
         <div class="kbody"><p class="kl">Acciones activas</p><p class="kv">{{ stats.acciones_activas }}</p></div>
       </div>
       <div class="kcard">
-        <div class="kicon"><i data-lucide="check-circle" width="18" height="18"></i></div>
         <div class="kbody"><p class="kl">Completadas</p><p class="kv">{{ stats.acciones_completadas }}</p></div>
       </div>
       <div class="kcard">
-        <div class="kicon"><i data-lucide="message-square" width="18" height="18"></i></div>
-        <div class="kbody"><p class="kl">Mensajes</p><p class="kv">{{ stats.mensajes_no_leidos || 0 }}</p><p class="ks">sin leer</p></div>
+        <div class="kbody"><p class="kl">Mensajes sin leer</p><p class="kv">{{ stats.mensajes_no_leidos || 0 }}</p></div>
       </div>
     </div>
 
@@ -282,9 +240,7 @@
           }
           @for (a of ultimasAcciones; track a.id) {
             <div class="arow">
-              <div class="aicon">
-                <i [attr.data-lucide]="getIconoTipo(a.tipo)" width="14" height="14"></i>
-              </div>
+              <div class="aicon">{{ getIconoTipo(a.tipo) }}</div>
               <div class="ainfo">
                 <p class="adesc">{{ a.titulo || a.descripcion }}</p>
                 <p class="ameta">{{ a.fecha_inicio | date:'dd/MM/yyyy' }}</p>

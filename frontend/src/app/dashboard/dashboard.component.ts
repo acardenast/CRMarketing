@@ -1,11 +1,10 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DashboardService } from '../services/dashboard.service';
 import { AuthService } from '../services/auth.service';
-
-declare const lucide: any;
+import { ClienteService } from '../services/cliente.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,15 +13,16 @@ declare const lucide: any;
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit, AfterViewInit {
+export class DashboardComponent implements OnInit {
   stats: any = null;
-  empresas: any[] = [];
-  clientes: any[] = [];
-  empresasRecientes: any[] = [];
-  clientesPorEstado: any[] = [];
   ultimasAcciones: any[] = [];
-  empresaSeleccionada: any = null;
-  clienteSeleccionado: any = null;
+  proximasAcciones: any[] = [];
+  clientesPorEstado: any[] = [];
+  empresasRecientes: any[] = [];
+  clientes: any[] = [];
+  empresas: any[] = [];
+  clienteSeleccionado: number | null = null;
+  empresaSeleccionada: number | null = null;
   today = new Date();
 
   isAdmin   = false;
@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   constructor(
     private dashboardService: DashboardService,
+    private clienteService: ClienteService,
     private auth: AuthService
   ) {}
 
@@ -38,56 +39,51 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.isAdmin   = this.auth.isAdmin();
     this.isEmpresa = this.auth.isEmpresa();
     this.isCliente = this.auth.isCliente();
+
+    if (this.isEmpresa) {
+      this.clienteService.getClientes().subscribe({
+        next: (data: any) => this.clientes = data,
+        error: () => {}
+      });
+    }
+    if (this.isAdmin) {
+      this.clienteService.getEmpresas().subscribe({
+        next: (data: any) => this.empresas = data,
+        error: () => {}
+      });
+    }
     this.cargarDatos();
   }
 
-  ngAfterViewInit(): void {
-    setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 50);
-  }
-
   cargarDatos(): void {
-    const empresaId = this.empresaSeleccionada ? +this.empresaSeleccionada : undefined;
-    const clienteId = this.clienteSeleccionado ? +this.clienteSeleccionado : undefined;
+    const cid = this.clienteSeleccionado || undefined;
+    const eid = this.empresaSeleccionada || undefined;
 
-    // Stats: siempre necesarias para todos los roles
-    this.dashboardService.getStats(empresaId).subscribe({
-      next: (data: any) => {
-        this.stats    = data;
-        this.empresas = data?.empresas || [];
-        this.clientes = data?.clientes || [];
-        setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 0);
-      },
+    this.dashboardService.getStats(this.isAdmin ? eid : undefined).subscribe({
+      next: (data: any) => { this.stats = data; },
       error: (err: any) => console.error('Stats error:', err)
     });
 
-    // Últimas acciones: solo admin y empresa
     if (this.isAdmin || this.isEmpresa) {
-      this.dashboardService.getUltimasAcciones(clienteId, empresaId).subscribe({
+      this.dashboardService.getUltimasAcciones(this.isAdmin ? undefined : cid, eid).subscribe({
         next: (data: any) => this.ultimasAcciones = data || [],
         error: () => {}
       });
     }
 
-    // Empresas recientes: solo admin
     if (this.isAdmin) {
       this.dashboardService.getEmpresasRecientes().subscribe({
         next: (data: any) => this.empresasRecientes = data || [],
         error: () => {}
       });
-    }
-
-    // Clientes por estado: solo empresa
-    if (this.isEmpresa) {
+    } else if (this.isEmpresa) {
       this.dashboardService.getClientesPorEstado().subscribe({
         next: (data: any) => this.clientesPorEstado = data || [],
         error: () => {}
       });
-    }
-
-    // Próximas acciones: solo cliente
-    if (this.isCliente) {
-      this.dashboardService.getProximasAcciones(clienteId).subscribe({
-        next: (data: any) => this.ultimasAcciones = data || [],
+    } else if (this.isCliente) {
+      this.dashboardService.getProximasAcciones().subscribe({
+        next: (data: any) => { this.ultimasAcciones = data || []; this.proximasAcciones = data || []; },
         error: () => {}
       });
     }
@@ -96,51 +92,43 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   filtrar(): void { this.cargarDatos(); }
 
   limpiarFiltro(): void {
-    this.empresaSeleccionada = null;
     this.clienteSeleccionado = null;
+    this.empresaSeleccionada = null;
     this.cargarDatos();
   }
 
   getIconoTipo(tipo: string): string {
     const map: Record<string, string> = {
-      llamada:     'phone',
-      email:       'mail',
-      reunion:     'calendar',
-      propuesta:   'file-text',
-      seguimiento: 'bell',
-      nota:        'pencil',
-      chat:        'message-square',
-      campana:     'megaphone'
+      llamada: '📞', email: '📧', reunion: '🤝', propuesta: '📄',
+      seguimiento: '🔔', nota: '📝', chat: '💬', campana: '📣'
     };
-    return map[tipo] ?? 'activity';
+    return map[tipo] ?? '⚡';
   }
 
   getClaseEstado(estado: string): string {
     const map: Record<string, string> = {
-      pendiente:   'est-pendiente',
-      en_progreso: 'est-progreso',
-      completada:  'est-completada',
-      cancelada:   'est-cancelada'
+      pendiente: 'est-pendiente', en_progreso: 'est-progreso',
+      completada: 'est-completada', cancelada: 'est-cancelada'
     };
     return map[estado] ?? '';
   }
 
   getClasePago(estado: string): string {
     const map: Record<string, string> = {
-      pendiente:  'pago-pendiente',
-      en_proceso: 'pago-proceso',
-      pagado:     'pago-pagado'
+      pendiente: 'pago-pendiente', en_proceso: 'pago-proceso', pagado: 'pago-pagado'
     };
     return map[estado] ?? '';
   }
 
-  getNombreEmpresa(): string {
-    const e = this.empresas.find((x: any) => x.id == this.empresaSeleccionada);
-    return e ? e.nombre : '';
-  }
-
   getNombreCliente(): string {
+    if (!this.clienteSeleccionado) return '';
     const c = this.clientes.find((x: any) => x.id == this.clienteSeleccionado);
     return c ? c.nombre : '';
+  }
+
+  getNombreEmpresa(): string {
+    if (!this.empresaSeleccionada) return '';
+    const e = this.empresas.find((x: any) => x.id == this.empresaSeleccionada);
+    return e ? e.nombre : '';
   }
 }
