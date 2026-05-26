@@ -40,8 +40,10 @@
   transition: color var(--t-fast);
 }
 
-.brand:hover .brand-mark {
-  color: var(--text-muted);
+@media (hover: hover) and (pointer: fine) {
+  .brand:hover .brand-mark {
+    color: var(--text-muted);
+  }
 }
 
 .brand-name {
@@ -93,9 +95,11 @@
   transition: color var(--t-fast);
 }
 
-.nav-link:hover {
-  color: var(--text-muted);
-  background: var(--surface-offset);
+@media (hover: hover) and (pointer: fine) {
+  .nav-link:hover {
+    color: var(--text-muted);
+    background: var(--surface-offset);
+  }
 }
 
 .nav-link:active {
@@ -116,7 +120,6 @@
   position: absolute;
   left: .6rem;
   right: .6rem;
-  bottom: calc((var(--nav-h) - 100%) / -2 + 0px);
   bottom: -0.9rem;
   height: 2px;
   background: var(--accent);
@@ -146,10 +149,12 @@
     transform 100ms cubic-bezier(.23,1,.32,1);
 }
 
-.icon-btn:hover {
-  background: var(--surface-offset);
-  color: var(--text-muted);
-  border-color: var(--border);
+@media (hover: hover) and (pointer: fine) {
+  .icon-btn:hover {
+    background: var(--surface-offset);
+    color: var(--text-muted);
+    border-color: var(--border);
+  }
 }
 
 .icon-btn:active {
@@ -174,9 +179,11 @@
     border-color var(--t-fast);
 }
 
-.user-block:hover {
-  background: var(--surface-offset);
-  border-color: var(--border-strong);
+@media (hover: hover) and (pointer: fine) {
+  .user-block:hover {
+    background: var(--surface-offset);
+    border-color: var(--border-strong);
+  }
 }
 
 .user-avatar {
@@ -190,7 +197,7 @@
   justify-content: center;
   font-family: var(--font-body);
   font-size: .7rem;
-  font-weight: 600;
+  font-weight: 700;
   flex-shrink: 0;
   border: 1px solid var(--border);
 }
@@ -224,10 +231,12 @@
   color: var(--text-faint);
 }
 
-.logout-btn:hover {
-  color: var(--error);
-  background: var(--error-subtle);
-  border-color: color-mix(in oklch, var(--error) 20%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .logout-btn:hover {
+    color: var(--error);
+    background: var(--error-subtle);
+    border-color: color-mix(in oklch, var(--error) 20%, transparent);
+  }
 }
 
 @media (max-width: 1024px) {
