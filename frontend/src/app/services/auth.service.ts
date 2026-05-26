@@ -20,15 +20,15 @@ export interface User {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly TOKEN_KEY = 'crm_token';
-  private readonly USER_KEY = 'crm_user';
+  private readonly USER_KEY  = 'crm_user';
 
-  private _user = signal<User | null>(this.loadUser());
+  private _user  = signal<User | null>(this.loadUser());
   private _token = signal<string | null>(localStorage.getItem(this.TOKEN_KEY));
 
-  readonly user = this._user.asReadonly();
-  readonly token = this._token.asReadonly();
-  readonly isAuth = computed(() => !!this._token());
-  readonly isAdmin = computed(() => this._user()?.rol === 'admin');
+  readonly user      = this._user.asReadonly();
+  readonly token     = this._token.asReadonly();
+  readonly isAuth    = computed(() => !!this._token());
+  readonly isAdmin   = computed(() => this._user()?.rol === 'admin');
   readonly isEmpresa = computed(() => this._user()?.rol === 'empresa');
   readonly isCliente = computed(() => this._user()?.rol === 'cliente');
 
@@ -41,10 +41,10 @@ export class AuthService {
     } catch { return null; }
   }
 
-  login(login: string, password: string, rol: string): Observable<{ token: string; user: User }> {
+  login(login: string, password: string): Observable<{ token: string; user: User }> {
     return this.http.post<{ token: string; user: User }>(
       `${environment.apiUrl}/auth/login`,
-      { login, password, rol }
+      { login, password }
     ).pipe(tap(res => {
       localStorage.setItem(this.TOKEN_KEY, res.token);
       localStorage.setItem(this.USER_KEY, JSON.stringify(res.user));
