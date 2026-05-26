@@ -16,8 +16,11 @@ export class SidebarComponent {
   isEmpresa: AuthService['isEmpresa'];
   isCliente: AuthService['isCliente'];
 
-  mobileOpen = signal(false);
-  isDark      = signal(false);
+  isDark = signal(this.detectDark());
+
+  get themeLabel(): string {
+    return this.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+  }
 
   constructor(public auth: AuthService) {
     this.user      = auth.user;
@@ -25,30 +28,30 @@ export class SidebarComponent {
     this.isEmpresa = auth.isEmpresa;
     this.isCliente = auth.isCliente;
 
-    // Inicializar tema según preferencia del sistema
-    const stored = localStorage.getItem('crm-theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const dark = stored ? stored === 'dark' : prefersDark;
-    this.isDark.set(dark);
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    // Aplica preferencia guardada al arrancar
+    const saved = localStorage.getItem('crm-theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      this.isDark.set(saved === 'dark');
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+      this.isDark.set(prefersDark);
+    }
   }
 
   toggleTheme(): void {
-    const next = !this.isDark();
-    this.isDark.set(next);
-    document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light');
-    localStorage.setItem('crm-theme', next ? 'dark' : 'light');
+    const next = this.isDark() ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('crm-theme', next);
+    this.isDark.set(next === 'dark');
   }
 
-  toggleMobile(): void {
-    this.mobileOpen.update(v => !v);
-  }
+  logout(): void { this.auth.logout(); }
 
-  closeMobile(): void {
-    this.mobileOpen.set(false);
-  }
-
-  logout(): void {
-    this.auth.logout();
+  private detectDark(): boolean {
+    const saved = localStorage.getItem('crm-theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
   }
 }
