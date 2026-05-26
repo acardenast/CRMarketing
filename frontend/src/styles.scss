@@ -1,56 +1,244 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* ═══════════════════════════════════════════════════════════
+   Art direction: CRM Marketing → editorial refinado
+   Palette: neutros cálidos, acento teal
+   Typography: Instrument Serif (display italic) + Instrument Sans (body)
+   Density: balanceada
+═══════════════════════════════════════════════════════════ */
 
-:root {
-  --bg-main: #f8fafc;
-  --bg-card: #ffffff;
-  --border-color: #e2e8f0;
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08);
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-success: #16a34a;
-  --color-danger: #dc2626;
-  --color-text: #0f172a;
-  --color-text-muted: #64748b;
-  --color-text-faint: #94a3b8;
-  --radius: 0.5rem;
-  --radius-lg: 0.75rem;
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+/* ── LIGHT MODE ─────────────────────────────────────────── */
+:root, [data-theme="light"] {
+  /* Surfaces */
+  --bg:              #f5f4f0;
+  --surface:         #fafaf7;
+  --surface-2:       #ffffff;
+  --surface-offset:  #edeae5;
+  --surface-hover:   #f0ede8;
+  --divider:         #e0ddd8;
+  --border:          rgba(40, 37, 29, 0.10);
+  --border-strong:   rgba(40, 37, 29, 0.18);
+
+  /* Text */
+  --text:            #1a1916;
+  --text-muted:      #6b6a65;
+  --text-faint:      #a8a7a2;
+  --text-inverse:    #fafaf7;
+
+  /* Accent teal */
+  --accent:          #01696f;
+  --accent-hover:    #0c4e54;
+  --accent-active:   #0f3638;
+  --accent-subtle:   rgba(1, 105, 111, 0.09);
+  --accent-highlight:rgba(1, 105, 111, 0.15);
+
+  /* Sidebar (siempre oscuro, no cambia con el tema) */
+  --sidebar-bg:      #1c1b18;
+  --sidebar-text:    rgba(255, 255, 255, 0.60);
+  --sidebar-text-active: #ffffff;
+  --sidebar-hover:   rgba(255, 255, 255, 0.08);
+  --sidebar-active:  rgba(255, 255, 255, 0.13);
+  --sidebar-border:  rgba(255, 255, 255, 0.07);
+  --sidebar-w:       220px;
+
+  /* Status */
+  --success:         #437a22;
+  --success-bg:      #d4dfcc;
+  --danger:          #a12c2c;
+  --danger-bg:       #fde8e8;
+  --warning:         #964219;
+  --warning-bg:      #fef0e0;
+  --info:            #1e5fa8;
+  --info-bg:         #dbeafe;
+  --purple:          #5b21b6;
+  --purple-bg:       #ede9fe;
+
+  /* Shadows */
+  --shadow-sm:       0 1px 3px rgba(26, 25, 22, 0.07);
+  --shadow-md:       0 4px 12px rgba(26, 25, 22, 0.09);
+  --shadow-lg:       0 12px 32px rgba(26, 25, 22, 0.12);
+
+  /* Radius */
+  --r-sm:  0.375rem;
+  --r-md:  0.5rem;
+  --r-lg:  0.75rem;
+  --r-xl:  1rem;
+  --r-full:9999px;
+
+  /* Typography */
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body:    'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Type scale fluida */
+  --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
+  --text-sm:   clamp(0.8rem,   0.75rem + 0.3vw,  0.9375rem);
+  --text-base: clamp(0.9375rem,0.9rem  + 0.2vw,  1rem);
+  --text-lg:   clamp(1.125rem, 1rem    + 0.6vw,  1.375rem);
+  --text-xl:   clamp(1.375rem, 1.1rem  + 1vw,    1.875rem);
+  --text-2xl:  clamp(1.75rem,  1.2rem  + 2vw,    2.75rem);
+
+  /* Easing */
+  --ease-out:  cubic-bezier(0.23, 1, 0.32, 1);
+  --t-fast:    110ms cubic-bezier(0.23, 1, 0.32, 1);
+  --t-normal:  180ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+/* ── DARK MODE ──────────────────────────────────────────── */
+[data-theme="dark"] {
+  --bg:              #141312;
+  --surface:         #1a1917;
+  --surface-2:       #201f1c;
+  --surface-offset:  #272521;
+  --surface-hover:   #2a2825;
+  --divider:         #2e2c28;
+  --border:          rgba(255, 255, 255, 0.08);
+  --border-strong:   rgba(255, 255, 255, 0.14);
+
+  --text:            #e8e6e0;
+  --text-muted:      #8a8880;
+  --text-faint:      #565450;
+  --text-inverse:    #1a1916;
+
+  --accent:          #4f98a3;
+  --accent-hover:    #3d8590;
+  --accent-active:   #2a6e78;
+  --accent-subtle:   rgba(79, 152, 163, 0.12);
+  --accent-highlight:rgba(79, 152, 163, 0.20);
+
+  --success:         #6daa45;
+  --success-bg:      rgba(109, 170, 69, 0.15);
+  --danger:          #e06060;
+  --danger-bg:       rgba(224, 96, 96, 0.14);
+  --warning:         #d4845a;
+  --warning-bg:      rgba(212, 132, 90, 0.14);
+  --info:            #5b94d4;
+  --info-bg:         rgba(91, 148, 212, 0.14);
+  --purple:          #a56ee0;
+  --purple-bg:       rgba(165, 110, 224, 0.14);
+
+  --shadow-sm:       0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-md:       0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg:       0 12px 32px rgba(0, 0, 0, 0.45);
+
+  /* Sidebar igual de oscuro en ambos temas */
+  --sidebar-bg:      #111010;
+  --sidebar-border:  rgba(255, 255, 255, 0.05);
+}
+
+/* Sistema prefers-color-scheme como fallback */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg:              #141312;
+    --surface:         #1a1917;
+    --surface-2:       #201f1c;
+    --surface-offset:  #272521;
+    --surface-hover:   #2a2825;
+    --divider:         #2e2c28;
+    --border:          rgba(255, 255, 255, 0.08);
+    --border-strong:   rgba(255, 255, 255, 0.14);
+    --text:            #e8e6e0;
+    --text-muted:      #8a8880;
+    --text-faint:      #565450;
+    --text-inverse:    #1a1916;
+    --accent:          #4f98a3;
+    --accent-hover:    #3d8590;
+    --accent-active:   #2a6e78;
+    --accent-subtle:   rgba(79, 152, 163, 0.12);
+    --accent-highlight:rgba(79, 152, 163, 0.20);
+    --success:         #6daa45;
+    --success-bg:      rgba(109, 170, 69, 0.15);
+    --danger:          #e06060;
+    --danger-bg:       rgba(224, 96, 96, 0.14);
+    --warning:         #d4845a;
+    --warning-bg:      rgba(212, 132, 90, 0.14);
+    --info:            #5b94d4;
+    --info-bg:         rgba(91, 148, 212, 0.14);
+    --purple:          #a56ee0;
+    --purple-bg:       rgba(165, 110, 224, 0.14);
+    --shadow-sm:       0 1px 3px rgba(0, 0, 0, 0.25);
+    --shadow-md:       0 4px 12px rgba(0, 0, 0, 0.35);
+    --shadow-lg:       0 12px 32px rgba(0, 0, 0, 0.45);
+    --sidebar-bg:      #111010;
+    --sidebar-border:  rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* ── BASE RESET ─────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-html, body {
-  height: 100%;
-  margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 14px;
-  color: var(--color-text);
-  background-color: var(--bg-main);
+html {
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  scroll-padding-top: 4rem;
 }
 
 body {
-  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text);
+  background-color: var(--bg);
+  transition: background-color var(--t-normal), color var(--t-normal);
 }
 
-a {
-  color: inherit;
-}
+a { color: inherit; text-decoration: none; }
+img, picture, video, svg { display: block; max-width: 100%; }
+input, button, textarea, select { font: inherit; color: inherit; }
+h1, h2, h3, h4, h5, h6 { text-wrap: balance; line-height: 1.2; }
+p { text-wrap: pretty; }
+button { cursor: pointer; background: none; border: none; }
 
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 999px;
+  background: var(--divider);
+  border-radius: var(--r-full);
 }
 
+::selection {
+  background: var(--accent-highlight);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── APP SHELL ──────────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  min-height: 100dvh;
+}
+
+.app-main {
+  flex: 1;
+  margin-left: var(--sidebar-w);
+  padding: 2rem 2.5rem;
+  background: var(--bg);
+  min-width: 0;
+  transition: background-color var(--t-normal);
+}
+
+/* ── CARD ────────────────────────────────────────────────── */
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
   box-shadow: var(--shadow-sm);
+  transition: background-color var(--t-normal), border-color var(--t-normal);
 }
