@@ -3,7 +3,8 @@ set -e
 
 cd /var/www/html
 
-composer install --no-dev --optimize-autoloader
+# Actualiza el lock file y luego instala (necesario cuando composer.json cambia sin actualizar el lock)
+composer update --no-dev --optimize-autoloader
 
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
