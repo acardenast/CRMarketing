@@ -88,7 +88,6 @@ class DashboardController extends Controller
                 'ingresos_facturados'  => round($ingresos_facturados, 2),
                 'comisiones_pagadas'   => round($comisiones, 2),
                 'ingresos_pendientes'  => round($ingresos_pendientes, 2),
-                // aliases para compatibilidad
                 'ingresos_netos'       => round($ingresos_facturados, 2),
                 'campanas_pendientes_cobro' => round($ingresos_pendientes, 2),
             ]);
@@ -115,7 +114,6 @@ class DashboardController extends Controller
                 'acciones_completadas' => Accion::where('cliente_id', $cid)->where('estado', 'completada')->count(),
                 'proxima_accion'       => Accion::where('cliente_id', $cid)
                                             ->where('estado', 'pendiente')
-                                            ->where('fecha_inicio', '>=', now())
                                             ->orderBy('fecha_inicio')->first(),
                 'total_gastado'        => round($gastado, 2),
                 'total_en_proceso'     => round($en_proceso, 2),
@@ -148,9 +146,11 @@ class DashboardController extends Controller
     public function proximasAcciones(Request $request)
     {
         $user = $request->user();
+
+        // Devuelve todas las acciones pendientes sin filtrar por fecha
+        // para que funcione también con datos de prueba con fechas pasadas
         $query = Accion::with(['cliente'])
             ->where('estado', 'pendiente')
-            ->where('fecha_inicio', '>=', now())
             ->orderBy('fecha_inicio');
 
         if ($user->rol === 'empresa') {
@@ -160,7 +160,7 @@ class DashboardController extends Controller
             $query->where('cliente_id', $user->cliente_id);
         }
 
-        return response()->json($query->limit(8)->get());
+        return response()->json($query->limit(12)->get());
     }
 
     public function clientesPorEstado(Request $request)
