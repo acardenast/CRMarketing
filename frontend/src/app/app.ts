@@ -5,7 +5,7 @@ import { SidebarComponent } from './shared/sidebar/sidebar.component';
 import { AuthService } from './services/auth.service';
 import { filter } from 'rxjs/operators';
 
-const PUBLIC_ROUTES = ['/login', '/registro'];
+const NO_SIDEBAR_ROUTES = ['/', '/login', '/registro'];
 
 @Component({
   selector: 'app-root',
@@ -21,7 +21,8 @@ export class AppComponent implements OnInit {
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe((e: NavigationEnd) => {
-        const isPublic = PUBLIC_ROUTES.some(p => e.urlAfterRedirects.startsWith(p));
+        const url = e.urlAfterRedirects;
+        const isPublic = url === '/' || NO_SIDEBAR_ROUTES.some(p => url.startsWith(p) && p !== '/');
         this.showSidebar.set(!isPublic);
       });
   }

@@ -2,7 +2,7 @@
 <nav class="nav-bar" [class.scrolled]="scrolled">
   <div class="nav-inner">
     <a routerLink="/" class="brand">
-      <span class="brand-icon material-icons">insights</span>
+      <span class="material-icons brand-icon">insights</span>
       CRMarketing
     </a>
     <div class="nav-actions">
@@ -23,15 +23,15 @@
       </div>
       <h1 class="hero-title">
         Gestiona clientes,<br />
-        <span class="text-accent">acciones y ventas</span><br />
+        <span class="text-accent">acciones y cobros</span><br />
         desde un solo lugar.
       </h1>
       <p class="hero-subtitle">
-        CRMarketing conecta empresas, clientes y equipos en una plataforma unificada con chat integrado, seguimiento de campañas, control de pagos y archivos compartidos.
+        CRMarketing conecta empresas y clientes en una plataforma unificada con chat integrado, seguimiento de campañas, control de pagos y archivos compartidos.
       </p>
       <div class="hero-btns">
         <a routerLink="/registro/empresa" class="btn-primary-lg">
-          Comenzar ahora
+          Registrar empresa
           <span class="material-icons btn-icon">arrow_forward</span>
         </a>
         <a routerLink="/login" class="btn-outline-lg">
@@ -39,13 +39,12 @@
           <span class="material-icons btn-icon">login</span>
         </a>
       </div>
-      <p class="hero-hint">Registro de empresa en menos de 2 minutos. Sin tarjeta de crédito.</p>
+      <p class="hero-hint">Registro de empresa en menos de 2 minutos.</p>
     </div>
 
     <div class="hero-visual">
       <div class="visual-bg"></div>
       <div class="dashboard-mockup">
-        <!-- Mockup UI -->
         <div class="mockup-topbar">
           <div class="mockup-dot red"></div>
           <div class="mockup-dot yellow"></div>
@@ -59,16 +58,31 @@
               <span class="stat-val">48</span>
             </div>
             <div class="stat-card accent">
-              <span class="stat-label">Acciones este mes</span>
-              <span class="stat-val">127</span>
-            </div>
-            <div class="stat-card">
               <span class="stat-label">Ingresos netos</span>
               <span class="stat-val">12.4k€</span>
             </div>
+            <div class="stat-card warn">
+              <span class="stat-label">Pendiente cobro</span>
+              <span class="stat-val">3.2k€</span>
+            </div>
+          </div>
+          <div class="mockup-money">
+            <div class="money-row">
+              <span class="money-label">Facturado este mes</span>
+              <span class="money-val green">15.600 €</span>
+            </div>
+            <div class="money-bar"><div class="money-fill" style="width:78%"></div></div>
+            <div class="money-row">
+              <span class="money-label">Cobrado</span>
+              <span class="money-val">12.400 € <span class="money-pct">78%</span></span>
+            </div>
+            <div class="money-row">
+              <span class="money-label">Pendiente</span>
+              <span class="money-val orange">3.200 €</span>
+            </div>
           </div>
           <div class="mockup-list">
-            <div class="mockup-row" *ngFor="let r of [1,2,3,4]">
+            <div class="mockup-row" *ngFor="let r of [1,2,3]">
               <div class="mockup-avatar"></div>
               <div class="mockup-lines">
                 <div class="mockup-line long"></div>
@@ -79,12 +93,11 @@
           </div>
         </div>
       </div>
-      <!-- Floating card -->
       <div class="float-card">
-        <span class="material-icons float-icon">chat</span>
+        <span class="material-icons float-icon">payments</span>
         <div>
-          <div class="float-title">Nuevo mensaje</div>
-          <div class="float-sub">Cliente Martínez — hace 2 min</div>
+          <div class="float-title">Cobro registrado</div>
+          <div class="float-sub">Cliente López — 1.200 €</div>
         </div>
       </div>
     </div>
@@ -131,7 +144,7 @@
 <section class="cta-section">
   <div class="cta-box">
     <h2 class="cta-title">Empieza a gestionar tu agencia hoy</h2>
-    <p class="cta-sub">Registra tu empresa, añade tus clientes y centraliza toda la comunicación y seguimiento en minutos.</p>
+    <p class="cta-sub">Registra tu empresa, añade tus clientes y centraliza toda la comunicación, seguimiento y cobros en minutos.</p>
     <div class="cta-btns">
       <a routerLink="/registro/empresa" class="btn-primary-lg">
         Registrar empresa

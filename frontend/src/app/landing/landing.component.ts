@@ -17,8 +17,8 @@ export class LandingComponent implements OnInit, OnDestroy {
   features = [
     {
       icon: 'groups',
-      titulo: 'Gestión de Clientes y Empresas',
-      descripcion: 'Centraliza todos tus clientes y empresas en un solo lugar. Consulta su estado, historial de acciones y comunicación en tiempo real desde su perfil.'
+      titulo: 'Gestión de Clientes',
+      descripcion: 'Centraliza todos tus clientes en un solo lugar. Consulta su estado, historial de acciones y comunicación en tiempo real desde su perfil.'
     },
     {
       icon: 'bolt',
@@ -27,13 +27,13 @@ export class LandingComponent implements OnInit, OnDestroy {
     },
     {
       icon: 'chat',
-      titulo: 'Chat Integrado por Acción',
+      titulo: 'Chat Integrado',
       descripcion: 'Comunica con tus clientes directamente desde la plataforma. Envía mensajes, comparte imágenes, documentos y archivos en cada conversación.'
     },
     {
-      icon: 'analytics',
-      titulo: 'Dashboard e Ingresos',
-      descripcion: 'Visualiza en tiempo real el estado de tus ventas, ingresos por empresa, acciones pendientes y conversión de clientes con gráficas claras.'
+      icon: 'payments',
+      titulo: 'Control de Cobros',
+      descripcion: 'Gestiona el estado de pago de cada acción: pendiente, parcial o pagado. Visualiza en el dashboard los ingresos netos y pendientes de cobro en tiempo real.'
     },
     {
       icon: 'calendar_month',
@@ -49,25 +49,18 @@ export class LandingComponent implements OnInit, OnDestroy {
 
   roles = [
     {
-      icon: 'admin_panel_settings',
-      nombre: 'Administrador',
-      descripcion: 'Visión global de todas las empresas, clientes e ingresos. Gestiona el acceso y supervisa el rendimiento de toda la plataforma.',
-      color: 'bg-purple-50 border-purple-200',
-      iconColor: 'text-purple-600'
-    },
-    {
       icon: 'business',
       nombre: 'Empresa',
-      descripcion: 'Gestiona tus propios clientes, crea acciones, lanza campañas y comunica con ellos a través del chat. Control total de tu cartera.',
-      color: 'bg-teal-50 border-teal-200',
-      iconColor: 'text-teal-600'
+      descripcion: 'Gestiona tus propios clientes, crea acciones, lanza campañas y comunica con ellos a través del chat. Control total de tu cartera y cobros.',
+      color: 'bg-teal-soft border-teal-200',
+      iconColor: 'text-teal'
     },
     {
       icon: 'person',
       nombre: 'Cliente',
-      descripcion: 'Portal propio para ver las acciones contratadas, hacer seguimiento de pagos y comunicarte directamente con tu agencia.',
-      color: 'bg-blue-50 border-blue-200',
-      iconColor: 'text-blue-600'
+      descripcion: 'Portal propio para ver las acciones contratadas, hacer seguimiento del estado de sus servicios y comunicarte directamente con tu agencia.',
+      color: 'bg-blue-soft border-blue-200',
+      iconColor: 'text-blue'
     }
   ];
 
