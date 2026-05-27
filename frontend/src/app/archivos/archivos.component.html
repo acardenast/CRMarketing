@@ -1,0 +1,70 @@
+<div class="ap">
+
+  <div class="a-back">
+    <a routerLink="/acciones" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+      Volver a acciones
+    </a>
+  </div>
+
+  <div class="a-header">
+    <div class="a-header-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13,2 13,9 20,9"/></svg>
+    </div>
+    <div>
+      <h1 class="a-title">Archivos</h1>
+      <p class="a-subtitle">Acción #{{ accionId }}</p>
+    </div>
+  </div>
+
+  @if (error)  { <div class="a-alert a-alert--error">{{ error }}</div> }
+  @if (exito)  { <div class="a-alert a-alert--ok">{{ exito }}</div> }
+
+  <!-- Drop zone -->
+  <div class="drop-zone" (drop)="onDrop($event)" (dragover)="onDragOver($event)">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#006565" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <p class="drop-text">Arrastra un archivo aquí o</p>
+    <label class="btn-upload" [class.uploading]="subiendo">
+      @if (subiendo) { <span>Subiendo…</span> }
+      @else { <span>Seleccionar archivo</span> }
+      <input type="file" hidden (change)="onFileSelected($event)" [disabled]="subiendo">
+    </label>
+  </div>
+
+  <!-- Lista archivos -->
+  @if (cargando) { <p class="a-loading">Cargando…</p> }
+
+  @if (!cargando) {
+    @if (archivos.length === 0) {
+      <div class="a-empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c0bdb5" stroke-width="1.25"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13,2 13,9 20,9"/></svg>
+        <p>No hay archivos todavía</p>
+      </div>
+    }
+    <div class="a-grid">
+      @for (f of archivos; track f.id) {
+        <div class="a-card">
+          @if (esImagen(f.mime_type)) {
+            <a [href]="f.url" target="_blank" class="a-thumb">
+              <img [src]="f.url" [alt]="f.nombre_original">
+            </a>
+          } @else {
+            <a [href]="f.url" target="_blank" class="a-thumb a-thumb--file">
+              <span class="a-file-icon">{{ icono(f.mime_type) }}</span>
+            </a>
+          }
+          <div class="a-info">
+            <a [href]="f.url" target="_blank" class="a-name">{{ f.nombre_original }}</a>
+            <span class="a-meta">{{ formatBytes(f.tamano) }} · {{ f.created_at | date:'dd/MM/yy HH:mm' }}</span>
+          </div>
+          @if (!auth.isCliente()) {
+            <button class="a-del" (click)="eliminar(f.id, f.nombre_original)" title="Eliminar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2L5,6"/><path d="M10,11v6"/><path d="M14,11v6"/></svg>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+
+</div>

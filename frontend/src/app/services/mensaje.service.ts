@@ -1,30 +1,40 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiService } from './api.service';
+import { environment } from '../../environments/environment';
 
 export interface Mensaje {
   id: number;
   accion_id: number;
   usuario_id: number | null;
-  cliente_id: number;
   mensaje: string;
-  tipo: string;
   leido: boolean;
-  fecha_lectura: string | null;
   created_at: string;
-  usuario?: any;
-  cliente?: any;
+  archivo_url?: string;
+  archivo_nombre?: string;
+  usuario?: { id: number; name: string; rol: string };
+  cliente?: { id: number; nombre: string };
 }
 
 @Injectable({ providedIn: 'root' })
 export class MensajeService {
-  constructor(private api: ApiService) {}
+  private base = environment.apiUrl;
 
-  getMensajes(accionId: number): Observable<Mensaje[]> {
-    return this.api.get(`acciones/${accionId}/mensajes`);
+  constructor(private http: HttpClient) {}
+
+  private headers(): HttpHeaders {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token') || '';
+    return new HttpHeaders({ 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' });
   }
 
-  enviarMensaje(accionId: number, mensaje: string): Observable<Mensaje> {
-    return this.api.post(`acciones/${accionId}/mensajes`, { mensaje });
+  getMensajes(accionId: number): Observable<Mensaje[]> {
+    return this.http.get<Mensaje[]>(`${this.base}/acciones/${accionId}/mensajes`, { headers: this.headers() });
+  }
+
+  enviarMensaje(accionId: number, mensaje: string, archivoUrl?: string, archivoNombre?: string): Observable<Mensaje> {
+    const body: any = { mensaje };
+    if (archivoUrl)    body.archivo_url    = archivoUrl;
+    if (archivoNombre) body.archivo_nombre = archivoNombre;
+    return this.http.post<Mensaje>(`${this.base}/acciones/${accionId}/mensajes`, body, { headers: this.headers() });
   }
 }

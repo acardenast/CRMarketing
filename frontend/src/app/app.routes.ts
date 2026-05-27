@@ -16,17 +16,15 @@ import { AccionesListaComponent }       from './acciones/lista/lista.component';
 import { AccionesFormularioComponent }  from './acciones/formulario/formulario.component';
 import { ChatComponent }                from './chat/chat.component';
 import { ChatClienteComponent }         from './chat-cliente/chat-cliente.component';
+import { ArchivosComponent }            from './archivos/archivos.component';
 
 export const routes: Routes = [
-  // Landing pública
   { path: '', component: LandingComponent },
 
-  // Rutas públicas (sin navbar)
   { path: 'login',              component: LoginComponent },
   { path: 'registro/empresa',   component: RegistroEmpresaComponent },
   { path: 'registro/cliente',   component: RegistroClienteComponent },
 
-  // Rutas protegidas
   { path: 'dashboard',           component: DashboardComponent,           canActivate: [authGuard] },
 
   { path: 'empresas',            component: EmpresasListaComponent,       canActivate: [authGuard, roleGuard('admin')] },
@@ -43,8 +41,10 @@ export const routes: Routes = [
   { path: 'acciones/nueva',      component: AccionesFormularioComponent,  canActivate: [authGuard, roleGuard('admin','empresa')] },
   { path: 'acciones/editar/:id', component: AccionesFormularioComponent,  canActivate: [authGuard, roleGuard('admin','empresa')] },
 
-  { path: 'chat/:accionId',          component: ChatComponent,        canActivate: [authGuard, roleGuard('admin','empresa','cliente')] },
-  { path: 'chat/cliente/:clienteId', component: ChatClienteComponent, canActivate: [authGuard, roleGuard('admin','empresa')] },
+  { path: 'archivos/:accionId',      component: ArchivosComponent,        canActivate: [authGuard, roleGuard('admin','empresa','cliente')] },
+
+  { path: 'chat/:accionId',          component: ChatComponent,            canActivate: [authGuard, roleGuard('admin','empresa','cliente')] },
+  { path: 'chat/cliente/:clienteId', component: ChatClienteComponent,     canActivate: [authGuard, roleGuard('admin','empresa')] },
 
   { path: '**', redirectTo: '/' }
 ];

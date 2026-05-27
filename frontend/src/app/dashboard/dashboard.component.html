@@ -195,13 +195,16 @@
   <div class="chart-card">
     <div class="card-header">
       <h3 class="card-title">Próximas Acciones</h3>
+      <a routerLink="/acciones" class="card-link">Ver todas
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
     </div>
     <div class="action-list">
-      @for (a of proximasAcciones; track a.id) {
+      @for (a of proximasAcciones.slice(0,5); track a.id) {
         <div class="action-item">
           <span class="action-icon">{{ getIconoTipo(a.tipo) }}</span>
           <div class="action-body">
-            <p class="action-title">{{ a.descripcion }}</p>
+            <p class="action-title">{{ a.descripcion || a.titulo || a.tipo }}</p>
             <span class="action-meta">{{ a.fecha_programada | date:'d MMM' : '' : 'es' }}</span>
           </div>
           <span class="badge" [ngClass]="getClaseEstado(a.estado)">{{ a.estado }}</span>
@@ -239,14 +242,42 @@
 
 </section>
 
+<!-- CALENDARIO CLIENTE -->
+@if (isCliente && proximasAcciones.length) {
+<section class="table-section cal-section">
+  <div class="card-header">
+    <h3 class="card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Calendario de acciones
+    </h3>
+    <a routerLink="/acciones" class="card-link">Ver todas →</a>
+  </div>
+  <div class="cal-grid">
+    @for (a of proximasAcciones; track a.id) {
+      <a [routerLink]="['/chat', a.id]" class="cal-item">
+        <div class="cal-date">
+          <span class="cal-day">{{ a.fecha_programada | date:'d' : '' : 'es' }}</span>
+          <span class="cal-month">{{ a.fecha_programada | date:'MMM' : '' : 'es' }}</span>
+        </div>
+        <div class="cal-info">
+          <span class="cal-tipo-icon">{{ getIconoTipo(a.tipo) }}</span>
+          <div>
+            <p class="cal-desc">{{ a.descripcion || a.titulo || a.tipo }}</p>
+            <span class="cal-badge" [ngClass]="'cal-' + a.estado">{{ a.estado }}</span>
+          </div>
+        </div>
+      </a>
+    }
+  </div>
+</section>
+}
+
 <!-- RESUMEN FINANCIERO EMPRESA -->
 @if (isEmpresa && ingresosEmpresa) {
 <section class="table-section">
   <div class="card-header">
     <h3 class="card-title">Resumen Financiero</h3>
   </div>
-
-  <!-- Barra de progreso estilo mockup landing -->
   <div class="fin-summary">
     <div class="fin-row fin-row--top">
       <span class="fin-label">Facturado este mes</span>
@@ -275,8 +306,6 @@
       <span class="fin-val fin-val--orange">{{ (ingresosEmpresa.ingresos_pendientes ?? ingresosEmpresa.pendiente ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</span>
     </div>
   </div>
-
-  <!-- Tabla acumulado -->
   <div class="table-wrap" style="margin-top:1.5rem">
     <table class="data-table data-table--full">
       <thead>

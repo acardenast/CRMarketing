@@ -18,13 +18,13 @@
     <div class="card">
       <table>
         <colgroup>
-          <col style="width:8%">
+          <col style="width:7%">
           <col style="width:20%">
-          <col style="width:15%">
-          <col style="width:10%">
-          <col style="width:10%">
-          <col style="width:12%">
-          <col style="width:25%">
+          <col style="width:14%">
+          <col style="width:9%">
+          <col style="width:9%">
+          <col style="width:11%">
+          <col style="width:30%">
         </colgroup>
         <thead>
           <tr>
@@ -40,11 +40,10 @@
         <tbody>
           @if (acciones.length === 0) {
             <tr><td colspan="7">
-              <div class="empty">Sin acciones · @if(!isCliente){<a routerLink="/acciones/nueva">Crear →</a>}</div>
+              <div class="empty">Sin acciones · @if(!isCliente){<a routerLink="/acciones/nueva">Crear →</a>}</div>
             </td></tr>
           }
           @for (a of acciones; track a.id) {
-      
             <tr [class.fila-campana]="a.tipo === 'campana'">
               <td><span class="tipo-icono">{{ getIconoTipo(a.tipo) }}</span> <span class="tipo">{{ a.tipo }}</span></td>
               <td class="trunc">{{ a.titulo || a.descripcion || '—' }}</td>
@@ -63,7 +62,6 @@
               </td>
               <td class="tar">
                 <div class="acts">
-                  <!-- Botón pagar solo para cliente si campaña no pagada -->
                   @if (isCliente && a.tipo === 'campana' && a.estado_pago !== 'pagado' && a.precio) {
                     <button (click)="pagarAccion(a)" class="ab btn-pagar-mini" [class.en-proceso]="a.estado_pago === 'en_proceso'">
                       {{ a.estado_pago === 'pendiente' ? '💳 Pagar' : '✅ Confirmar' }}
@@ -73,7 +71,12 @@
                     <a [routerLink]="['/acciones/editar', a.id]" class="ab ae">Editar</a>
                     <button (click)="eliminarAccion(a.id)" class="ab ad">Eliminar</button>
                   }
-                  <!-- CHAT — todos los roles -->
+                  <!-- Archivos -->
+                  <a [routerLink]="['/archivos', a.id]" class="ab ab-files">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13,2 13,9 20,9"/></svg>
+                    Archivos
+                  </a>
+                  <!-- Chat -->
                   <a [routerLink]="['/chat', a.id]" class="ab ae">💬 Chat</a>
                 </div>
               </td>
