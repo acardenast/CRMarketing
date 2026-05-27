@@ -34,6 +34,10 @@ class DashboardController extends Controller
                 ->whereYear('updated_at', now()->year)
                 ->sum('comision');
 
+            $ingresos_totales = Accion::where('tipo','campana')
+                ->where('estado_pago','pagado')
+                ->sum('ingreso_neto');
+
             return response()->json([
                 'total_empresas'     => Empresa::count(),
                 'empresas_activas'   => Empresa::where('activa',true)->count(),
@@ -42,11 +46,13 @@ class DashboardController extends Controller
                 'total_usuarios'     => User::count(),
                 'total_clientes'     => $clientesQ->count(),
                 'total_acciones'     => $accionesQ->count(),
+                'acciones_pendientes'=> (clone $accionesQ)->where('estado','pendiente')->count(),
                 'acciones_hoy'       => (clone $accionesQ)->whereDate('created_at', today())->count(),
                 'nuevos_esta_semana' => (clone $clientesQ)->where('created_at','>=',now()->startOfWeek())->count(),
                 'mensualidades'      => $mensualidades,
                 'comisiones_mes'     => round($comisiones, 2),
                 'total_ingresos_mes' => round($mensualidades + $comisiones, 2),
+                'ingresos_totales'   => round($ingresos_totales, 2),
             ]);
         }
 
@@ -55,31 +61,36 @@ class DashboardController extends Controller
             $empresa = Empresa::find($eid);
             $porcentaje = ($empresa && $empresa->plan === 'premium') ? 5 : 10;
 
-            $ingresos = Accion::where('empresa_id', $eid)
+            $ingresos_facturados = Accion::where('empresa_id', $eid)
                 ->where('tipo', 'campana')
                 ->where('estado_pago', 'pagado')
                 ->sum('ingreso_neto');
+
             $comisiones = Accion::where('empresa_id', $eid)
                 ->where('tipo', 'campana')
                 ->where('estado_pago', 'pagado')
                 ->sum('comision');
-            $pendiente = Accion::where('empresa_id', $eid)
+
+            $ingresos_pendientes = Accion::where('empresa_id', $eid)
                 ->where('tipo', 'campana')
                 ->where('estado_pago', 'pendiente')
                 ->sum('precio');
 
             return response()->json([
-                'total_clientes'      => Cliente::where('empresa_id', $eid)->count(),
-                'clientes_activos'    => Cliente::where('empresa_id', $eid)->where('estado', 'cliente')->count(),
-                'total_acciones'      => Accion::where('empresa_id', $eid)->count(),
-                'acciones_pendientes' => Accion::where('empresa_id', $eid)->where('estado', 'pendiente')->count(),
-                'leads'               => Cliente::where('empresa_id', $eid)->where('estado', 'lead')->count(),
-                'en_negociacion'      => Cliente::where('empresa_id', $eid)->where('estado', 'negociacion')->count(),
-                'plan'                => $empresa->plan ?? 'basico',
-                'porcentaje_crm'      => $porcentaje,
-                'ingresos_netos'      => round($ingresos, 2),
-                'comisiones_pagadas'  => round($comisiones, 2),
-                'campanas_pendientes_cobro' => round($pendiente, 2),
+                'total_clientes'       => Cliente::where('empresa_id', $eid)->count(),
+                'clientes_activos'     => Cliente::where('empresa_id', $eid)->where('estado', 'cliente')->count(),
+                'total_acciones'       => Accion::where('empresa_id', $eid)->count(),
+                'acciones_pendientes'  => Accion::where('empresa_id', $eid)->where('estado', 'pendiente')->count(),
+                'leads'                => Cliente::where('empresa_id', $eid)->where('estado', 'lead')->count(),
+                'en_negociacion'       => Cliente::where('empresa_id', $eid)->where('estado', 'negociacion')->count(),
+                'plan'                 => $empresa->plan ?? 'basico',
+                'porcentaje_crm'       => $porcentaje,
+                'ingresos_facturados'  => round($ingresos_facturados, 2),
+                'comisiones_pagadas'   => round($comisiones, 2),
+                'ingresos_pendientes'  => round($ingresos_pendientes, 2),
+                // aliases para compatibilidad
+                'ingresos_netos'       => round($ingresos_facturados, 2),
+                'campanas_pendientes_cobro' => round($ingresos_pendientes, 2),
             ]);
         }
 
@@ -109,6 +120,7 @@ class DashboardController extends Controller
                 'total_gastado'        => round($gastado, 2),
                 'total_en_proceso'     => round($en_proceso, 2),
                 'total_pendiente'      => round($pendiente, 2),
+                'total_a_pagar'        => round($pendiente + $en_proceso, 2),
             ]);
         }
 
@@ -165,11 +177,28 @@ class DashboardController extends Controller
 
     public function empresasRecientes(Request $request)
     {
-        return response()->json(
-            Empresa::withCount(['clientes', 'usuarios'])
-                ->orderBy('created_at', 'desc')
-                ->limit(6)->get()
-        );
+        $empresas = Empresa::withCount(['clientes', 'usuarios'])
+            ->orderBy('created_at', 'desc')
+            ->limit(6)
+            ->get()
+            ->map(function ($e) {
+                $e->ingresos_facturados = round(
+                    Accion::where('empresa_id', $e->id)
+                        ->where('tipo', 'campana')
+                        ->where('estado_pago', 'pagado')
+                        ->sum('ingreso_neto'), 2
+                );
+                $e->ingresos_pendientes = round(
+                    Accion::where('empresa_id', $e->id)
+                        ->where('tipo', 'campana')
+                        ->where('estado_pago', 'pendiente')
+                        ->sum('precio'), 2
+                );
+                $e->total_clientes = $e->clientes_count;
+                return $e;
+            });
+
+        return response()->json($empresas);
     }
 
     public function ingresosAdmin(Request $request)
@@ -209,11 +238,13 @@ class DashboardController extends Controller
         $campanas = $query->with('cliente')->orderBy('created_at', 'desc')->get();
 
         return response()->json([
-            'total_facturado' => round($campanas->sum('precio'), 2),
-            'ingresos_netos'  => round($campanas->where('estado_pago', 'pagado')->sum('ingreso_neto'), 2),
-            'comisiones'      => round($campanas->where('estado_pago', 'pagado')->sum('comision'), 2),
-            'pendiente'       => round($campanas->where('estado_pago', 'pendiente')->sum('precio'), 2),
-            'campanas'        => $campanas,
+            'total_facturado'    => round($campanas->sum('precio'), 2),
+            'ingresos_netos'     => round($campanas->where('estado_pago', 'pagado')->sum('ingreso_neto'), 2),
+            'ingresos_facturados'=> round($campanas->where('estado_pago', 'pagado')->sum('ingreso_neto'), 2),
+            'comisiones'         => round($campanas->where('estado_pago', 'pagado')->sum('comision'), 2),
+            'pendiente'          => round($campanas->where('estado_pago', 'pendiente')->sum('precio'), 2),
+            'ingresos_pendientes'=> round($campanas->where('estado_pago', 'pendiente')->sum('precio'), 2),
+            'campanas'           => $campanas,
         ]);
     }
 }
