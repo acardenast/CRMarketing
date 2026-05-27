@@ -4,11 +4,10 @@
     <h2 class="dash-title">Panel Principal</h2>
     <p class="dash-subtitle">
       Visión general del rendimiento
-      <span class="dash-date">· {{ today | date:'d "de" MMMM "de" yyyy' : '' : 'es' }}</span>
+      <span class="dash-date">· {{ today | date:'d MMMM yyyy' : '' : 'es' }}</span>
     </p>
   </div>
 
-  <!-- Filtros Admin -->
   @if (isAdmin) {
     <div class="filter-row">
       <select class="filter-select" [(ngModel)]="empresaSeleccionada" (change)="filtrar()">
@@ -23,7 +22,6 @@
     </div>
   }
 
-  <!-- Filtros Empresa -->
   @if (isEmpresa) {
     <div class="filter-row">
       <select class="filter-select" [(ngModel)]="clienteSeleccionado" (change)="filtrar()">
@@ -39,7 +37,6 @@
   }
 </header>
 
-<!-- Loading -->
 @if (cargando) {
   <div class="loading-grid">
     @for (i of [1,2,3,4]; track i) {
@@ -50,7 +47,7 @@
 
 @if (!cargando) {
 
-<!-- ── KPI METRICS ──────────────────────────────────────────────────── -->
+<!-- KPI -->
 @if (stats) {
 <section class="kgrid">
 
@@ -140,7 +137,7 @@
 </section>
 }
 
-<!-- ── GRID CENTRAL 8/4 ────────────────────────────────────────────── -->
+<!-- MID GRID -->
 <section class="mid-grid">
 
   @if (isEmpresa && clientesPorEstado.length) {
@@ -242,13 +239,45 @@
 
 </section>
 
-<!-- ── TABLA EMPRESA ─────────────────────────────────────────────────── -->
+<!-- RESUMEN FINANCIERO EMPRESA -->
 @if (isEmpresa && ingresosEmpresa) {
 <section class="table-section">
   <div class="card-header">
     <h3 class="card-title">Resumen Financiero</h3>
   </div>
-  <div class="table-wrap">
+
+  <!-- Barra de progreso estilo mockup landing -->
+  <div class="fin-summary">
+    <div class="fin-row fin-row--top">
+      <span class="fin-label">Facturado este mes</span>
+      <span class="fin-val fin-val--green">{{ (ingresosEmpresa.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</span>
+    </div>
+    <div class="fin-bar-track">
+      <div class="fin-bar-fill"
+           [style.width.%]="(ingresosEmpresa.ingresos_facturados ?? 0) > 0
+             ? ((ingresosEmpresa.ingresos_netos ?? ingresosEmpresa.ingresos_facturados ?? 0) / (ingresosEmpresa.ingresos_facturados ?? 1) * 100)
+             : 0">
+      </div>
+    </div>
+    <div class="fin-row">
+      <span class="fin-label">Cobrado</span>
+      <span class="fin-val">
+        {{ (ingresosEmpresa.ingresos_netos ?? ingresosEmpresa.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}
+        @if ((ingresosEmpresa.ingresos_facturados ?? 0) > 0) {
+          <span class="fin-pct">
+            {{ ((ingresosEmpresa.ingresos_netos ?? ingresosEmpresa.ingresos_facturados ?? 0) / (ingresosEmpresa.ingresos_facturados ?? 1) * 100) | number:'1.0-0' }}%
+          </span>
+        }
+      </span>
+    </div>
+    <div class="fin-row">
+      <span class="fin-label">Pendiente</span>
+      <span class="fin-val fin-val--orange">{{ (ingresosEmpresa.ingresos_pendientes ?? ingresosEmpresa.pendiente ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</span>
+    </div>
+  </div>
+
+  <!-- Tabla acumulado -->
+  <div class="table-wrap" style="margin-top:1.5rem">
     <table class="data-table data-table--full">
       <thead>
         <tr>
@@ -271,7 +300,7 @@
 </section>
 }
 
-<!-- ── TABLA ADMIN ───────────────────────────────────────────────────── -->
+<!-- TABLA ADMIN -->
 @if (isAdmin && empresasRecientes.length) {
 <section class="table-section">
   <div class="card-header">
@@ -310,7 +339,6 @@
 </section>
 }
 
-<!-- Error -->
 @if (error) {
   <div class="error-banner">{{ error }}</div>
 }
