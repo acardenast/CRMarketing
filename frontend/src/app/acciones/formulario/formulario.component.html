@@ -1,35 +1,42 @@
-<div style="max-width:560px;">
+<div class="form-page">
 
-  <div style="margin-bottom:1.25rem;">
-    <a routerLink="/acciones" style="display:inline-flex;align-items:center;gap:0.375rem;font-size:0.8125rem;color:#64748b;text-decoration:none;font-weight:500;">
+  <div class="form-back">
+    <a routerLink="/acciones" class="back-link">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
       Volver a acciones
     </a>
   </div>
 
-  <div class="card" style="padding:1.75rem;">
+  <div class="form-card">
 
-    <div style="margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #f1f5f9;">
-      <h1 class="page-title">{{ esEdicion ? 'Editar acción' : 'Nueva acción' }}</h1>
-      <p class="page-subtitle">{{ esEdicion ? 'Modifica los datos de la acción' : 'Registra una nueva interacción con un cliente' }}</p>
+    <div class="form-card-header">
+      <div class="form-card-header-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+          <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="form-title">{{ esEdicion ? 'Editar acción' : 'Nueva acción' }}</h1>
+        <p class="form-subtitle">{{ esEdicion ? 'Modifica los datos de la acción' : 'Registra una nueva interacción con un cliente' }}</p>
+      </div>
     </div>
 
-    <div *ngIf="error" class="alert alert-error" style="margin-bottom:1.25rem;">{{ error }}</div>
+    <div *ngIf="error" class="form-alert">{{ error }}</div>
 
-    <form (ngSubmit)="guardar()" #formulario="ngForm" style="display:flex;flex-direction:column;gap:1.125rem;">
+    <form (ngSubmit)="guardar()" #formulario="ngForm" class="form-body">
 
-      <div class="form-group">
-        <label class="form-label">Cliente <span style="color:#dc2626;">*</span></label>
-        <select class="form-control" [(ngModel)]="accion.cliente_id" name="cliente_id" required (ngModelChange)="seleccionarCliente($event)">
+      <div class="form-field">
+        <label class="field-label">Cliente <span class="field-required">*</span></label>
+        <select class="field-input" [(ngModel)]="accion.cliente_id" name="cliente_id" required (ngModelChange)="seleccionarCliente($event)">
           <option [ngValue]="null" disabled>Selecciona un cliente</option>
           <option *ngFor="let c of clientes" [ngValue]="c.id">{{ c.nombre }}</option>
         </select>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-        <div class="form-group">
-          <label class="form-label">Tipo</label>
-          <select class="form-control" [(ngModel)]="accion.tipo" name="tipo" (ngModelChange)="onPrecioChange()">
+      <div class="form-row">
+        <div class="form-field">
+          <label class="field-label">Tipo</label>
+          <select class="field-input" [(ngModel)]="accion.tipo" name="tipo" (ngModelChange)="onPrecioChange()">
             <option value="llamada">📞 Llamada</option>
             <option value="email">📧 Email</option>
             <option value="reunion">🤝 Reunión</option>
@@ -38,9 +45,9 @@
             <option value="campana">📣 Campaña</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Estado</label>
-          <select class="form-control" [(ngModel)]="accion.estado" name="estado">
+        <div class="form-field">
+          <label class="field-label">Estado</label>
+          <select class="field-input" [(ngModel)]="accion.estado" name="estado">
             <option value="pendiente">Pendiente</option>
             <option value="en_progreso">En progreso</option>
             <option value="completada">Completada</option>
@@ -49,57 +56,58 @@
         </div>
       </div>
 
-      <!-- Campo precio — solo para campañas -->
-      <div *ngIf="accion.tipo === 'campana'" class="form-group">
-        <label class="form-label">💰 Precio campaña (€)</label>
-        <input type="number" class="form-control" [(ngModel)]="accion.precio" name="precio"
+      <div *ngIf="accion.tipo === 'campana'" class="form-field">
+        <label class="field-label">💰 Precio campaña (€)</label>
+        <input type="number" class="field-input" [(ngModel)]="accion.precio" name="precio"
                min="0" step="0.01" placeholder="0.00" (input)="onPrecioChange()" />
       </div>
 
-      <!-- Estado de pago — solo para campañas en edición -->
-      <div *ngIf="accion.tipo === 'campana' && esEdicion" class="form-group">
-        <label class="form-label">Estado de pago</label>
-        <select class="form-control" [(ngModel)]="accion.estado_pago" name="estado_pago">
+      <div *ngIf="accion.tipo === 'campana' && esEdicion" class="form-field">
+        <label class="field-label">Estado de pago</label>
+        <select class="field-input" [(ngModel)]="accion.estado_pago" name="estado_pago">
           <option value="pendiente">⏳ Pendiente</option>
           <option value="en_proceso">🔄 En proceso</option>
           <option value="pagado">✅ Pagado</option>
         </select>
       </div>
 
-      <!-- Preview comisión -->
-      <div *ngIf="precioCalculado" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:.375rem;padding:.75rem 1rem;display:flex;flex-direction:column;gap:.3rem;">
-        <div style="display:flex;justify-content:space-between;font-size:.82rem;">
-          <span>Precio campaña</span><strong>{{ precioCalculado.precio | number:'1.2-2' }}€</strong>
+      <div *ngIf="precioCalculado" class="form-precio-preview">
+        <div class="precio-row">
+          <span>Precio campaña</span>
+          <strong>{{ precioCalculado.precio | number:'1.2-2' }}€</strong>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:.82rem;color:#6b7280;">
-          <span>Comisión CRM ({{ precioCalculado.porcentaje }}%)</span><span>-{{ precioCalculado.comision | number:'1.2-2' }}€</span>
+        <div class="precio-row precio-row--muted">
+          <span>Comisión CRM ({{ precioCalculado.porcentaje }}%)</span>
+          <span>-{{ precioCalculado.comision | number:'1.2-2' }}€</span>
         </div>
-        <div style="border-top:1px solid #bbf7d0;margin:.25rem 0;"></div>
-        <div style="display:flex;justify-content:space-between;font-size:.82rem;">
-          <span>Ingreso neto empresa</span><strong style="color:#16a34a;">{{ precioCalculado.neto | number:'1.2-2' }}€</strong>
+        <div class="precio-divider"></div>
+        <div class="precio-row">
+          <span>Ingreso neto empresa</span>
+          <strong class="precio-neto">{{ precioCalculado.neto | number:'1.2-2' }}€</strong>
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Fecha <span style="color:#dc2626;">*</span></label>
-        <input type="date" class="form-control" [(ngModel)]="accion.fecha_inicio" name="fecha_inicio" required/>
+      <div class="form-field">
+        <label class="field-label">Fecha <span class="field-required">*</span></label>
+        <input type="date" class="field-input" [(ngModel)]="accion.fecha_inicio" name="fecha_inicio" required/>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Descripción</label>
-        <textarea class="form-control" [(ngModel)]="accion.descripcion" name="descripcion" rows="3" placeholder="Describe la acción realizada..."></textarea>
+      <div class="form-field">
+        <label class="field-label">Descripción</label>
+        <textarea class="field-input field-textarea" [(ngModel)]="accion.descripcion" name="descripcion" rows="3" placeholder="Describe la acción realizada..."></textarea>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Resultado</label>
-        <textarea class="form-control" [(ngModel)]="accion.resultado" name="resultado" rows="2" placeholder="Resultado o próximo paso..."></textarea>
+      <div class="form-field">
+        <label class="field-label">Resultado</label>
+        <textarea class="field-input field-textarea" [(ngModel)]="accion.resultado" name="resultado" rows="2" placeholder="Resultado o próximo paso..."></textarea>
       </div>
 
-      <div style="display:flex;gap:0.625rem;padding-top:0.5rem;border-top:1px solid #f1f5f9;margin-top:0.375rem;">
-        <button type="submit" class="btn btn-primary" [disabled]="guardando || formulario.invalid">
+      <div class="form-actions">
+        <button type="submit" class="btn-submit" [disabled]="guardando || formulario.invalid">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>
           {{ guardando ? 'Guardando...' : (esEdicion ? 'Actualizar acción' : 'Crear acción') }}
         </button>
-        <a routerLink="/acciones" class="btn btn-secondary">Cancelar</a>
+        <a routerLink="/acciones" class="btn-cancel">Cancelar</a>
       </div>
 
     </form>
