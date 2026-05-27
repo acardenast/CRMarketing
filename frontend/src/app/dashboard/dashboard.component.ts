@@ -15,6 +15,7 @@ import { ClienteService } from '../services/cliente.service';
 })
 export class DashboardComponent implements OnInit {
   stats: any = null;
+  ingresosEmpresa: any = null;
   ultimasAcciones: any[] = [];
   proximasAcciones: any[] = [];
   clientesPorEstado: any[] = [];
@@ -62,9 +63,16 @@ export class DashboardComponent implements OnInit {
     const eid = this.empresaSeleccionada || undefined;
 
     this.dashboardService.getStats(this.isAdmin ? eid : undefined).subscribe({
-    next: (data: any) => { this.stats = data; },
-    error: () => this.error = 'No se pudieron cargar las estadísticas'
+      next: (data: any) => { this.stats = data; },
+      error: () => this.error = 'No se pudieron cargar las estadísticas'
     });
+
+    if (this.isEmpresa) {
+      this.dashboardService.getIngresosEmpresa(cid).subscribe({
+        next: (data: any) => { this.ingresosEmpresa = data; },
+        error: () => {}
+      });
+    }
 
     if (this.isAdmin || this.isEmpresa) {
       this.dashboardService.getUltimasAcciones(this.isAdmin ? undefined : cid, eid).subscribe({

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ClienteService } from '../../services/cliente.service';
 import { AccionService } from '../../services/accion.service';
 import { AuthService } from '../../services/auth.service';
+import { MensajeService, Mensaje } from '../../services/mensaje.service';
 
 @Component({
   selector: 'app-clientes-detalle',
@@ -32,6 +33,13 @@ export class ClientesDetalleComponent implements OnInit {
   guardandoAccion = false;
   precioCalculado: any = null;
 
+  // Chat inline
+  mensajes: Mensaje[] = [];
+  nuevoMensaje = '';
+  enviandoMensaje = false;
+  chatAccionId: number | null = null;
+  cargandoMensajes = false;
+
   // Calendario
   mesActual: Date = new Date();
   diasCalendario: any[] = [];
@@ -41,6 +49,7 @@ export class ClientesDetalleComponent implements OnInit {
     private clienteService: ClienteService,
     private accionService: AccionService,
     private auth: AuthService,
+    private mensajeService: MensajeService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -62,18 +71,53 @@ export class ClientesDetalleComponent implements OnInit {
       next: (data: any) => {
         this.acciones = data.filter((a: any) => a.cliente_id === this.cliente.id);
         this.generarCalendario();
+        // Si hay acciones con chat, preseleccionar la primera para el chat inline
+        if (!this.chatAccionId && this.acciones.length > 0) {
+          this.chatAccionId = this.acciones[0].id;
+        }
       },
       error: () => {}
     });
   }
 
   cambiarTab(tab: 'resumen' | 'acciones' | 'chat' | 'calendario') {
-    if (tab === 'chat') {
-      this.router.navigate(['/chat/cliente', this.cliente.id]);
-      return;
-    }
     this.tabActiva = tab;
+    if (tab === 'chat') {
+      this.cargarMensajes();
+    }
     if (tab === 'calendario') this.generarCalendario();
+  }
+
+  // ── CHAT INLINE ──
+  cargarMensajes() {
+    if (!this.chatAccionId) return;
+    this.cargandoMensajes = true;
+    this.mensajeService.getMensajes(this.chatAccionId).subscribe({
+      next: (data: Mensaje[]) => { this.mensajes = data; this.cargandoMensajes = false; },
+      error: () => { this.cargandoMensajes = false; }
+    });
+  }
+
+  seleccionarAccionChat(accionId: number) {
+    this.chatAccionId = accionId;
+    this.cargarMensajes();
+  }
+
+  enviarMensaje() {
+    if (!this.nuevoMensaje.trim() || !this.chatAccionId || this.enviandoMensaje) return;
+    this.enviandoMensaje = true;
+    this.mensajeService.enviarMensaje(this.chatAccionId, this.nuevoMensaje.trim()).subscribe({
+      next: (m: Mensaje) => {
+        this.mensajes = [...this.mensajes, m];
+        this.nuevoMensaje = '';
+        this.enviandoMensaje = false;
+      },
+      error: () => { this.enviandoMensaje = false; }
+    });
+  }
+
+  irAChatCompleto() {
+    this.router.navigate(['/chat/cliente', this.cliente.id]);
   }
 
   // ── PRECIO PREVIEW ──
@@ -178,5 +222,10 @@ export class ClientesDetalleComponent implements OnInit {
   getClasePago(estado: string): string {
     const m: any = { pendiente:'pago-pendiente', en_proceso:'pago-proceso', pagado:'pago-pagado' };
     return m[estado] || '';
+  }
+
+  getMensajeClase(m: Mensaje): string {
+    const user = this.auth.user();
+    return m.usuario_id === user?.id ? 'msg-propio' : 'msg-otro';
   }
 }

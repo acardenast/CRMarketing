@@ -67,7 +67,6 @@
         </button>
       </div>
 
-      <!-- Formulario nueva acción -->
       <div *ngIf="mostrarFormAccion" class="form-accion">
         <div class="form-row">
           <label>Título *</label>
@@ -91,27 +90,16 @@
           </div>
         </div>
 
-        <!-- Precio (solo campañas) -->
         <div *ngIf="nuevaAccion.tipo==='campana'" class="form-row">
           <label>💰 Precio campaña (€)</label>
           <input type="number" min="0" step="0.01" [(ngModel)]="nuevaAccion.precio" (input)="onPrecioChange()" placeholder="0.00" />
         </div>
 
-        <!-- Preview comisión -->
         <div *ngIf="precioCalculado" class="precio-preview">
-          <div class="preview-row">
-            <span>Precio campaña</span>
-            <strong>{{ precioCalculado.precio | number:'1.2-2' }}€</strong>
-          </div>
-          <div class="preview-row muted">
-            <span>Comisión CRM ({{ precioCalculado.porcentaje }}%)</span>
-            <span>-{{ precioCalculado.comision | number:'1.2-2' }}€</span>
-          </div>
+          <div class="preview-row"><span>Precio campaña</span><strong>{{ precioCalculado.precio | number:'1.2-2' }}€</strong></div>
+          <div class="preview-row muted"><span>Comisión CRM ({{ precioCalculado.porcentaje }}%)</span><span>-{{ precioCalculado.comision | number:'1.2-2' }}€</span></div>
           <div class="preview-divider"></div>
-          <div class="preview-row green">
-            <span>Ingreso neto empresa</span>
-            <strong>{{ precioCalculado.neto | number:'1.2-2' }}€</strong>
-          </div>
+          <div class="preview-row green"><span>Ingreso neto empresa</span><strong>{{ precioCalculado.neto | number:'1.2-2' }}€</strong></div>
         </div>
 
         <div class="form-row">
@@ -131,7 +119,6 @@
         </button>
       </div>
 
-      <!-- Lista acciones -->
       <div *ngIf="acciones.length===0 && !mostrarFormAccion" class="vacio-msg grande">
         <span>⚡</span><p>No hay acciones registradas para este cliente.</p>
         <button *ngIf="isEmpresa" class="btn btn-primary" (click)="mostrarFormAccion=true">Crear primera acción</button>
@@ -148,23 +135,14 @@
               <span class="estado-mini" [class]="'estado-' + a.estado">{{ a.estado }}</span>
             </div>
             <div *ngIf="a.descripcion" class="accion-item-desc">{{ a.descripcion }}</div>
-
-            <!-- Bloque financiero de campaña -->
             <div *ngIf="a.tipo==='campana' && a.precio" class="campana-finanzas">
-              <div class="fin-row">
-                <span>Precio</span><strong>{{ a.precio | number:'1.2-2' }}€</strong>
-              </div>
-              <div class="fin-row muted">
-                <span>Comisión CRM</span><span>-{{ a.comision | number:'1.2-2' }}€</span>
-              </div>
-              <div class="fin-row green">
-                <span>Ingreso neto</span><strong>{{ a.ingreso_neto | number:'1.2-2' }}€</strong>
-              </div>
+              <div class="fin-row"><span>Precio</span><strong>{{ a.precio | number:'1.2-2' }}€</strong></div>
+              <div class="fin-row muted"><span>Comisión CRM</span><span>-{{ a.comision | number:'1.2-2' }}€</span></div>
+              <div class="fin-row green"><span>Ingreso neto</span><strong>{{ a.ingreso_neto | number:'1.2-2' }}€</strong></div>
               <div class="fin-row pago-row">
                 <span>Estado pago</span>
                 <span class="pago-badge" [ngClass]="getClasePago(a.estado_pago)">{{ a.estado_pago }}</span>
               </div>
-              <!-- Botón pagar (solo cliente, si no está pagado) -->
               <div *ngIf="isCliente && a.estado_pago !== 'pagado'" class="pago-btn-wrap">
                 <button class="btn-pagar" [class.en-proceso]="a.estado_pago==='en_proceso'" (click)="pagarAccion(a)">
                   {{ a.estado_pago === 'pendiente' ? '💳 Pagar' : '✅ Confirmar pago' }}
@@ -178,12 +156,51 @@
       </div>
     </div>
 
-    <!-- ── CHAT ── -->
+    <!-- ── CHAT INLINE ── -->
     <div *ngIf="tabActiva==='chat'" class="tab-content">
-      <div class="chat-placeholder">
-        <div class="chat-icon">💬</div>
-        <h3>Chat con {{ cliente.nombre }}</h3>
-        <p>El chat en tiempo real se implementará próximamente.</p>
+      <div class="chat-inline-header">
+        <h2 class="chat-inline-title">💬 Chat con {{ cliente.nombre }}</h2>
+        <button class="btn btn-ghost btn-sm" (click)="irAChatCompleto()">Abrir chat completo →</button>
+      </div>
+
+      <!-- Selector de acción si hay varias -->
+      <div *ngIf="acciones.length > 1" class="chat-accion-selector">
+        <label>Conversación de:</label>
+        <select [(ngModel)]="chatAccionId" (change)="cargarMensajes()">
+          <option *ngFor="let a of acciones" [value]="a.id">{{ getIconoTipo(a.tipo) }} {{ a.titulo }}</option>
+        </select>
+      </div>
+
+      <div *ngIf="acciones.length === 0" class="vacio-msg">
+        No hay acciones para este cliente. Crea una en la pestaña <strong>Acciones</strong> para iniciar una conversación.
+      </div>
+
+      <div *ngIf="acciones.length > 0" class="chat-box">
+        <!-- Mensajes -->
+        <div class="chat-mensajes" #chatScroll>
+          <div *ngIf="cargandoMensajes" class="chat-loading">Cargando mensajes...</div>
+          <div *ngIf="!cargandoMensajes && mensajes.length === 0" class="chat-vacio">Sin mensajes aún. ¡Escribe el primero!</div>
+          <div *ngFor="let m of mensajes" class="chat-msg" [ngClass]="getMensajeClase(m)">
+            <div class="msg-burbuja">
+              <span class="msg-autor">{{ m.usuario?.name || m.cliente?.nombre || 'Usuario' }}</span>
+              <p class="msg-texto">{{ m.mensaje }}</p>
+              <span class="msg-hora">{{ m.created_at | date:'HH:mm' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input envío -->
+        <div class="chat-input-row">
+          <input
+            class="chat-input"
+            [(ngModel)]="nuevoMensaje"
+            placeholder="Escribe un mensaje..."
+            (keydown.enter)="enviarMensaje()"
+          />
+          <button class="chat-send-btn" (click)="enviarMensaje()" [disabled]="enviandoMensaje || !nuevoMensaje.trim()">
+            {{ enviandoMensaje ? '...' : '➤' }}
+          </button>
+        </div>
       </div>
     </div>
 

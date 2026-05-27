@@ -4,7 +4,7 @@
     <h2 class="dash-title">Panel Principal</h2>
     <p class="dash-subtitle">
       Visión general del rendimiento
-      <span class="dash-date">· {{ today | date:'d \"de\" MMMM \"de\" yyyy' : '' : 'es' }}</span>
+      <span class="dash-date">· {{ today | date:'d "de" MMMM "de" yyyy' : '' : 'es' }}</span>
     </p>
   </div>
 
@@ -54,7 +54,6 @@
 @if (stats) {
 <section class="kgrid">
 
-  <!-- Total Clientes / Empresas -->
   @if (isAdmin) {
     <div class="kcard">
       <span class="klabel">Total Empresas</span>
@@ -81,11 +80,11 @@
       </div>
     </div>
     <div class="kcard">
-      <span class="klabel">Ingresos Totales</span>
+      <span class="klabel">Ingresos Totales (Neto)</span>
       <div class="kv kv-money">{{ (stats.ingresos_totales ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</div>
       <div class="kdelta kd-up">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
-        Acumulado
+        Acumulado cobrado
       </div>
     </div>
   }
@@ -109,7 +108,7 @@
     </div>
     <div class="kcard">
       <span class="klabel">Ingresos Facturados</span>
-      <div class="kv kv-money">{{ (stats.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</div>
+      <div class="kv kv-money">{{ (ingresosEmpresa?.ingresos_facturados ?? stats.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</div>
       <div class="kdelta kd-up">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
         Cobrado
@@ -117,7 +116,7 @@
     </div>
     <div class="kcard">
       <span class="klabel">Ingresos Pendientes</span>
-      <div class="kv kv-money kv-warn">{{ (stats.ingresos_pendientes ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</div>
+      <div class="kv kv-money kv-warn">{{ (ingresosEmpresa?.ingresos_pendientes ?? stats.ingresos_pendientes ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</div>
       <div class="kdelta kd-warn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         Por cobrar
@@ -144,7 +143,6 @@
 <!-- ── GRID CENTRAL 8/4 ────────────────────────────────────────────── -->
 <section class="mid-grid">
 
-  <!-- ── Clientes por Estado (Empresa) ── -->
   @if (isEmpresa && clientesPorEstado.length) {
   <div class="chart-card">
     <div class="card-header">
@@ -165,7 +163,6 @@
   </div>
   }
 
-  <!-- ── Empresas Recientes (Admin) ── -->
   @if (isAdmin && empresasRecientes.length) {
   <div class="chart-card">
     <div class="card-header">
@@ -187,7 +184,7 @@
         @for (e of empresasRecientes; track e.id) {
           <tr>
             <td class="td-name">{{ e.nombre }}</td>
-            <td class="text-right">{{ e.total_clientes ?? '—' }}</td>
+            <td class="text-right">{{ e.total_clientes ?? e.clientes_count ?? '—' }}</td>
             <td class="text-right td-green">{{ (e.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
             <td class="text-right td-warn">{{ (e.ingresos_pendientes ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
           </tr>
@@ -197,7 +194,6 @@
   </div>
   }
 
-  <!-- ── Próximas Acciones (Cliente) ── -->
   @if (isCliente && proximasAcciones.length) {
   <div class="chart-card">
     <div class="card-header">
@@ -218,7 +214,6 @@
   </div>
   }
 
-  <!-- ── Actividad Reciente (Admin/Empresa) ── -->
   @if ((isAdmin || isEmpresa) && ultimasAcciones.length) {
   <div class="feed-card">
     <div class="card-header">
@@ -247,8 +242,8 @@
 
 </section>
 
-<!-- ── TABLA CAMPAÑAS / PAGOS ──────────────────────────────────────── -->
-@if (isEmpresa && stats) {
+<!-- ── TABLA EMPRESA ─────────────────────────────────────────────────── -->
+@if (isEmpresa && ingresosEmpresa) {
 <section class="table-section">
   <div class="card-header">
     <h3 class="card-title">Resumen Financiero</h3>
@@ -266,9 +261,9 @@
       <tbody>
         <tr>
           <td class="td-name">Total acumulado</td>
-          <td class="text-right">{{ ((stats.ingresos_facturados ?? 0) + (stats.ingresos_pendientes ?? 0)) | currency:'EUR':'symbol':'1.0-0' }}</td>
-          <td class="text-right td-green">{{ (stats.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
-          <td class="text-right td-warn">{{ (stats.ingresos_pendientes ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
+          <td class="text-right">{{ (ingresosEmpresa.ingresos_netos ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
+          <td class="text-right td-green">{{ (ingresosEmpresa.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
+          <td class="text-right td-warn">{{ (ingresosEmpresa.ingresos_pendientes ?? ingresosEmpresa.pendiente ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
         </tr>
       </tbody>
     </table>
@@ -276,6 +271,7 @@
 </section>
 }
 
+<!-- ── TABLA ADMIN ───────────────────────────────────────────────────── -->
 @if (isAdmin && empresasRecientes.length) {
 <section class="table-section">
   <div class="card-header">
@@ -295,7 +291,7 @@
         @for (e of empresasRecientes; track e.id) {
           <tr>
             <td class="td-name">{{ e.nombre }}</td>
-            <td class="text-right">{{ e.total_clientes ?? '—' }}</td>
+            <td class="text-right">{{ e.total_clientes ?? e.clientes_count ?? '—' }}</td>
             <td class="text-right td-green">{{ (e.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
             <td class="text-right td-warn">{{ (e.ingresos_pendientes ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
           </tr>
