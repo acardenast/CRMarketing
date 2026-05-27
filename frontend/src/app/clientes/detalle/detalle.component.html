@@ -25,6 +25,7 @@
       <button class="tab-btn" [class.activa]="tabActiva==='resumen'"    (click)="cambiarTab('resumen')">📋 Resumen</button>
       <button class="tab-btn" [class.activa]="tabActiva==='acciones'"   (click)="cambiarTab('acciones')">⚡ Acciones</button>
       <button class="tab-btn" [class.activa]="tabActiva==='chat'"       (click)="cambiarTab('chat')">💬 Chat</button>
+      <button class="tab-btn" [class.activa]="tabActiva==='archivos'"   (click)="cambiarTab('archivos')">📁 Archivos</button>
       <button class="tab-btn" [class.activa]="tabActiva==='calendario'" (click)="cambiarTab('calendario')">📅 Calendario</button>
     </div>
 
@@ -68,10 +69,7 @@
       </div>
 
       <div *ngIf="mostrarFormAccion" class="form-accion">
-        <div class="form-row">
-          <label>Título *</label>
-          <input [(ngModel)]="nuevaAccion.titulo" placeholder="Título de la acción" />
-        </div>
+        <div class="form-row"><label>Título *</label><input [(ngModel)]="nuevaAccion.titulo" placeholder="Título de la acción" /></div>
         <div class="form-row-2">
           <div class="form-row">
             <label>Tipo</label>
@@ -84,39 +82,21 @@
               <option value="seguimiento">🔔 Seguimiento</option>
             </select>
           </div>
-          <div class="form-row">
-            <label>Fecha</label>
-            <input type="datetime-local" [(ngModel)]="nuevaAccion.fecha_inicio" />
-          </div>
+          <div class="form-row"><label>Fecha</label><input type="datetime-local" [(ngModel)]="nuevaAccion.fecha_inicio" /></div>
         </div>
-
         <div *ngIf="nuevaAccion.tipo==='campana'" class="form-row">
           <label>💰 Precio campaña (€)</label>
           <input type="number" min="0" step="0.01" [(ngModel)]="nuevaAccion.precio" (input)="onPrecioChange()" placeholder="0.00" />
         </div>
-
         <div *ngIf="precioCalculado" class="precio-preview">
           <div class="preview-row"><span>Precio campaña</span><strong>{{ precioCalculado.precio | number:'1.2-2' }}€</strong></div>
           <div class="preview-row muted"><span>Comisión CRM ({{ precioCalculado.porcentaje }}%)</span><span>-{{ precioCalculado.comision | number:'1.2-2' }}€</span></div>
           <div class="preview-divider"></div>
           <div class="preview-row green"><span>Ingreso neto empresa</span><strong>{{ precioCalculado.neto | number:'1.2-2' }}€</strong></div>
         </div>
-
-        <div class="form-row">
-          <label>Descripción</label>
-          <textarea [(ngModel)]="nuevaAccion.descripcion" rows="3" placeholder="Descripción opcional..."></textarea>
-        </div>
-        <div class="form-row">
-          <label>Estado</label>
-          <select [(ngModel)]="nuevaAccion.estado">
-            <option value="pendiente">Pendiente</option>
-            <option value="en_progreso">En progreso</option>
-            <option value="completada">Completada</option>
-          </select>
-        </div>
-        <button class="btn btn-primary" (click)="guardarAccion()" [disabled]="guardandoAccion || !nuevaAccion.titulo">
-          {{ guardandoAccion ? 'Guardando...' : 'Guardar acción' }}
-        </button>
+        <div class="form-row"><label>Descripción</label><textarea [(ngModel)]="nuevaAccion.descripcion" rows="3" placeholder="Descripción opcional..."></textarea></div>
+        <div class="form-row"><label>Estado</label><select [(ngModel)]="nuevaAccion.estado"><option value="pendiente">Pendiente</option><option value="en_progreso">En progreso</option><option value="completada">Completada</option></select></div>
+        <button class="btn btn-primary" (click)="guardarAccion()" [disabled]="guardandoAccion || !nuevaAccion.titulo">{{ guardandoAccion ? 'Guardando...' : 'Guardar acción' }}</button>
       </div>
 
       <div *ngIf="acciones.length===0 && !mostrarFormAccion" class="vacio-msg grande">
@@ -163,10 +143,9 @@
         <button class="btn btn-ghost btn-sm" (click)="irAChatCompleto()">Abrir chat completo →</button>
       </div>
 
-      <!-- Selector de acción si hay varias -->
       <div *ngIf="acciones.length > 1" class="chat-accion-selector">
         <label>Conversación de:</label>
-        <select [(ngModel)]="chatAccionId" (change)="cargarMensajes()">
+        <select [(ngModel)]="chatAccionId" (change)="seleccionarAccionChat(+$any($event.target).value)">
           <option *ngFor="let a of acciones" [value]="a.id">{{ getIconoTipo(a.tipo) }} {{ a.titulo }}</option>
         </select>
       </div>
@@ -176,30 +155,93 @@
       </div>
 
       <div *ngIf="acciones.length > 0" class="chat-box">
-        <!-- Mensajes -->
-        <div class="chat-mensajes" #chatScroll>
+        <div class="chat-mensajes">
           <div *ngIf="cargandoMensajes" class="chat-loading">Cargando mensajes...</div>
           <div *ngIf="!cargandoMensajes && mensajes.length === 0" class="chat-vacio">Sin mensajes aún. ¡Escribe el primero!</div>
-          <div *ngFor="let m of mensajes" class="chat-msg" [ngClass]="getMensajeClase(m)">
-            <div class="msg-burbuja">
-              <span class="msg-autor">{{ m.usuario?.name || m.cliente?.nombre || 'Usuario' }}</span>
-              <p class="msg-texto">{{ m.mensaje }}</p>
-              <span class="msg-hora">{{ m.created_at | date:'HH:mm' }}</span>
+
+          <ng-container *ngFor="let m of mensajes">
+            <!-- Mensaje archivo -->
+            <div *ngIf="$any(m).tipo === 'archivo'" class="chat-msg" [ngClass]="getMensajeClase(m)">
+              <div class="msg-burbuja msg-archivo">
+                <span class="msg-autor">{{ $any(m).usuario?.name || $any(m).cliente?.nombre || 'Usuario' }}</span>
+                <a [href]="$any(m).archivo?.url" target="_blank" class="archivo-adjunto">
+                  <span class="archivo-icono">{{ iconoArchivo($any(m).archivo?.mime_type || '') }}</span>
+                  <span class="archivo-nombre">{{ $any(m).archivo?.nombre_original }}</span>
+                  <span class="archivo-tamano">{{ formatBytes($any(m).archivo?.tamano || 0) }}</span>
+                </a>
+                <span class="msg-hora">{{ m.created_at | date:'HH:mm' }}</span>
+              </div>
             </div>
-          </div>
+            <!-- Mensaje texto -->
+            <div *ngIf="$any(m).tipo !== 'archivo'" class="chat-msg" [ngClass]="getMensajeClase(m)">
+              <div class="msg-burbuja">
+                <span class="msg-autor">{{ $any(m).usuario?.name || $any(m).cliente?.nombre || 'Usuario' }}</span>
+                <p class="msg-texto">{{ m.mensaje }}</p>
+                <span class="msg-hora">{{ m.created_at | date:'HH:mm' }}</span>
+              </div>
+            </div>
+          </ng-container>
         </div>
 
         <!-- Input envío -->
         <div class="chat-input-row">
+          <label class="chat-file-btn" title="Adjuntar archivo">
+            📎
+            <input type="file" style="display:none" (change)="onArchivoChat($event)" [disabled]="subiendoArchivo" />
+          </label>
+          <span *ngIf="subiendoArchivo" class="chat-uploading">Subiendo...</span>
           <input
+            *ngIf="!subiendoArchivo"
             class="chat-input"
             [(ngModel)]="nuevoMensaje"
             placeholder="Escribe un mensaje..."
             (keydown.enter)="enviarMensaje()"
           />
-          <button class="chat-send-btn" (click)="enviarMensaje()" [disabled]="enviandoMensaje || !nuevoMensaje.trim()">
+          <button class="chat-send-btn" (click)="enviarMensaje()" [disabled]="enviandoMensaje || !nuevoMensaje.trim() || subiendoArchivo">
             {{ enviandoMensaje ? '...' : '➤' }}
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ARCHIVOS ── -->
+    <div *ngIf="tabActiva==='archivos'" class="tab-content">
+      <div class="archivos-header">
+        <h2 class="archivos-title">📁 Archivos de {{ cliente.nombre }}</h2>
+        <div class="archivos-filtro">
+          <label>Filtrar por acción:</label>
+          <select [(ngModel)]="filtroArchivoAccionId" (change)="filtrarArchivos()">
+            <option [value]="null">Todas las acciones</option>
+            <option *ngFor="let a of acciones" [value]="a.id">{{ getIconoTipo(a.tipo) }} {{ a.titulo }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div *ngIf="cargandoArchivos" class="vacio-msg">Cargando archivos...</div>
+
+      <div *ngIf="!cargandoArchivos && archivos.length === 0" class="vacio-msg grande">
+        <span>📁</span>
+        <p>No hay archivos adjuntos{{ filtroArchivoAccionId ? ' para esta acción' : '' }}.</p>
+        <small>Los archivos se suben desde la pestaña <strong>Chat</strong> usando el botón 📎.</small>
+      </div>
+
+      <div *ngIf="!cargandoArchivos && archivos.length > 0" class="archivos-grid">
+        <div *ngFor="let a of archivos" class="archivo-card">
+          <!-- Previsualización imagen -->
+          <div class="archivo-preview">
+            <img *ngIf="esImagen(a.mime_type)" [src]="a.url" [alt]="a.nombre_original" class="archivo-img" />
+            <div *ngIf="!esImagen(a.mime_type)" class="archivo-icono-grande">{{ iconoArchivo(a.mime_type) }}</div>
+          </div>
+          <div class="archivo-info">
+            <a [href]="a.url" target="_blank" class="archivo-nombre-link">{{ a.nombre_original }}</a>
+            <div class="archivo-meta">
+              <span class="archivo-accion">{{ a.accion?.titulo || 'Acción #' + a.accion_id }}</span>
+              <span class="archivo-size">{{ formatBytes(a.tamano) }}</span>
+              <span class="archivo-fecha">{{ a.created_at | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div *ngIf="a.usuario" class="archivo-autor">Subido por {{ a.usuario.name }}</div>
+          </div>
+          <button *ngIf="isEmpresa" class="btn-delete" (click)="eliminarArchivo(a.id)" title="Eliminar archivo">🗑️</button>
         </div>
       </div>
     </div>
@@ -215,15 +257,11 @@
         <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
       </div>
       <div class="calendario-grid">
-        <div *ngFor="let dia of diasCalendario"
-             class="calendario-dia"
-             [class.vacio]="!dia"
-             [class.con-acciones]="dia?.acciones?.length>0"
-             [class.hoy]="dia?.fecha?.toDateString()===hoy.toDateString()">
+        <div *ngFor="let dia of diasCalendario" class="calendario-dia" [class.vacio]="!dia" [class.con-acciones]="dia?.acciones?.length>0" [class.hoy]="dia?.fecha?.toDateString()===hoy.toDateString()">
           <ng-container *ngIf="dia">
             <span class="dia-num">{{ dia.dia }}</span>
             <div class="dia-acciones">
-              <div *ngFor="let a of dia.acciones" class="dia-evento">{{ getIconoTipo(a.tipo) }} {{ a.titulo }}</div>
+              <div *ngFor="let ac of dia.acciones" class="dia-evento">{{ getIconoTipo(ac.tipo) }} {{ ac.titulo }}</div>
             </div>
           </ng-container>
         </div>

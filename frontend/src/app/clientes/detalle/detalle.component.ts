@@ -6,6 +6,7 @@ import { ClienteService } from '../../services/cliente.service';
 import { AccionService } from '../../services/accion.service';
 import { AuthService } from '../../services/auth.service';
 import { MensajeService, Mensaje } from '../../services/mensaje.service';
+import { ArchivoService, Archivo } from '../../services/archivo.service';
 
 @Component({
   selector: 'app-clientes-detalle',
@@ -20,16 +21,13 @@ export class ClientesDetalleComponent implements OnInit {
   acciones: any[] = [];
   cargando = true;
   error = '';
-  tabActiva: 'resumen' | 'acciones' | 'chat' | 'calendario' = 'resumen';
+  tabActiva: 'resumen' | 'acciones' | 'chat' | 'archivos' | 'calendario' = 'resumen';
   isCliente = false;
   isEmpresa = false;
 
   // Acciones
   mostrarFormAccion = false;
-  nuevaAccion: any = {
-    tipo: 'llamada', titulo: '', descripcion: '',
-    fecha_inicio: '', estado: 'pendiente', precio: null
-  };
+  nuevaAccion: any = { tipo: 'llamada', titulo: '', descripcion: '', fecha_inicio: '', estado: 'pendiente', precio: null };
   guardandoAccion = false;
   precioCalculado: any = null;
 
@@ -39,6 +37,14 @@ export class ClientesDetalleComponent implements OnInit {
   enviandoMensaje = false;
   chatAccionId: number | null = null;
   cargandoMensajes = false;
+
+  // Upload de archivo desde chat
+  subiendoArchivo = false;
+
+  // Archivos tab
+  archivos: Archivo[] = [];
+  cargandoArchivos = false;
+  filtroArchivoAccionId: number | null = null;
 
   // Calendario
   mesActual: Date = new Date();
@@ -50,6 +56,7 @@ export class ClientesDetalleComponent implements OnInit {
     private accionService: AccionService,
     private auth: AuthService,
     private mensajeService: MensajeService,
+    private archivoService: ArchivoService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -71,7 +78,6 @@ export class ClientesDetalleComponent implements OnInit {
       next: (data: any) => {
         this.acciones = data.filter((a: any) => a.cliente_id === this.cliente.id);
         this.generarCalendario();
-        // Si hay acciones con chat, preseleccionar la primera para el chat inline
         if (!this.chatAccionId && this.acciones.length > 0) {
           this.chatAccionId = this.acciones[0].id;
         }
@@ -80,11 +86,10 @@ export class ClientesDetalleComponent implements OnInit {
     });
   }
 
-  cambiarTab(tab: 'resumen' | 'acciones' | 'chat' | 'calendario') {
+  cambiarTab(tab: 'resumen' | 'acciones' | 'chat' | 'archivos' | 'calendario') {
     this.tabActiva = tab;
-    if (tab === 'chat') {
-      this.cargarMensajes();
-    }
+    if (tab === 'chat') this.cargarMensajes();
+    if (tab === 'archivos') this.cargarArchivosCliente();
     if (tab === 'calendario') this.generarCalendario();
   }
 
@@ -116,9 +121,67 @@ export class ClientesDetalleComponent implements OnInit {
     });
   }
 
+  onArchivoChat(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length || !this.chatAccionId) return;
+    const file = input.files[0];
+    this.subiendoArchivo = true;
+    this.archivoService.subirArchivo(this.chatAccionId, file).subscribe({
+      next: (a: Archivo) => {
+        // Añadir mensaje sintético tipo "archivo" para mostrarlo en el chat
+        const msgArchivo: any = {
+          id: Date.now(),
+          accion_id: this.chatAccionId,
+          mensaje: '__archivo__',
+          tipo: 'archivo',
+          archivo: a,
+          usuario_id: this.auth.user()?.id ?? null,
+          created_at: new Date().toISOString(),
+          usuario: this.auth.user()
+        };
+        this.mensajes = [...this.mensajes, msgArchivo];
+        this.subiendoArchivo = false;
+        input.value = '';
+      },
+      error: () => { this.subiendoArchivo = false; }
+    });
+  }
+
   irAChatCompleto() {
     this.router.navigate(['/chat/cliente', this.cliente.id]);
   }
+
+  getMensajeClase(m: Mensaje): string {
+    const user = this.auth.user();
+    return (m as any).usuario_id === user?.id ? 'msg-propio' : 'msg-otro';
+  }
+
+  // ── ARCHIVOS TAB ──
+  cargarArchivosCliente() {
+    if (!this.cliente) return;
+    this.cargandoArchivos = true;
+    const fid = this.filtroArchivoAccionId || undefined;
+    this.archivoService.getArchivosPorCliente(this.cliente.id, fid).subscribe({
+      next: (data: Archivo[]) => { this.archivos = data; this.cargandoArchivos = false; },
+      error: () => { this.cargandoArchivos = false; }
+    });
+  }
+
+  filtrarArchivos() {
+    this.cargarArchivosCliente();
+  }
+
+  eliminarArchivo(id: number) {
+    if (!confirm('¿Eliminar este archivo?')) return;
+    this.archivoService.eliminarArchivo(id).subscribe({
+      next: () => { this.archivos = this.archivos.filter(a => a.id !== id); },
+      error: () => alert('Error al eliminar el archivo')
+    });
+  }
+
+  formatBytes(b: number) { return this.archivoService.formatBytes(b); }
+  esImagen(mime: string) { return this.archivoService.esImagen(mime); }
+  iconoArchivo(mime: string) { return this.archivoService.icono(mime); }
 
   // ── PRECIO PREVIEW ──
   onPrecioChange() {
@@ -135,15 +198,10 @@ export class ClientesDetalleComponent implements OnInit {
     }
   }
 
-  // ── GUARDAR ACCIÓN ──
   guardarAccion() {
     this.guardandoAccion = true;
-    const payload: any = {
-      ...this.nuevaAccion,
-      cliente_id: this.cliente.id,
-      empresa_id: this.cliente.empresa_id
-    };
-    if (payload.tipo !== 'campana') { delete payload.precio; }
+    const payload: any = { ...this.nuevaAccion, cliente_id: this.cliente.id, empresa_id: this.cliente.empresa_id };
+    if (payload.tipo !== 'campana') delete payload.precio;
     this.accionService.crearAccion(payload).subscribe({
       next: () => {
         this.mostrarFormAccion = false;
@@ -162,12 +220,9 @@ export class ClientesDetalleComponent implements OnInit {
     }
   }
 
-  // ── PAGO (cliente) ──
   pagarAccion(accion: any) {
     const siguiente = accion.estado_pago === 'pendiente' ? 'en_proceso' : 'pagado';
-    const msg = accion.estado_pago === 'pendiente'
-      ? '¿Iniciar el proceso de pago?'
-      : '✅ ¿Confirmar el pago? Esta acción no se puede deshacer.';
+    const msg = accion.estado_pago === 'pendiente' ? '¿Iniciar el proceso de pago?' : '✅ ¿Confirmar el pago? Esta acción no se puede deshacer.';
     if (confirm(msg)) {
       this.accionService.actualizarPago(accion.id, siguiente).subscribe({
         next: () => this.cargarAcciones(),
@@ -222,10 +277,5 @@ export class ClientesDetalleComponent implements OnInit {
   getClasePago(estado: string): string {
     const m: any = { pendiente:'pago-pendiente', en_proceso:'pago-proceso', pagado:'pago-pagado' };
     return m[estado] || '';
-  }
-
-  getMensajeClase(m: Mensaje): string {
-    const user = this.auth.user();
-    return m.usuario_id === user?.id ? 'msg-propio' : 'msg-otro';
   }
 }

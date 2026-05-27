@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ClienteController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\AccionController;
 use App\Http\Controllers\Api\MensajeController;
+use App\Http\Controllers\Api\ArchivoController;
 
 // ── Rutas públicas ────────────────────────────────────────────────────────────
 Route::post('/auth/login',            [AuthController::class, 'login']);
@@ -21,30 +22,39 @@ Route::get('/public/empresas', function () {
 
 // ── Rutas protegidas ──────────────────────────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/auth/me',   [AuthController::class, 'me']);
+    Route::get('/auth/me',      [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/user', fn(Request $r) => $r->user());
 
-    // Dashboard — todos los roles
-    Route::get('/dashboard/stats',            [DashboardController::class, 'stats']);
-    Route::get('/dashboard/ultimas-acciones', [DashboardController::class, 'ultimasAcciones']);
-    Route::get('/dashboard/clientes-estado',  [DashboardController::class, 'clientesPorEstado']);
-    Route::get('/dashboard/proximas-acciones',[DashboardController::class, 'proximasAcciones']);
-    Route::get('/dashboard/ingresos-admin',   [DashboardController::class, 'ingresosAdmin']);
-    Route::get('/dashboard/ingresos-empresa', [DashboardController::class, 'ingresosEmpresa']);
+    // Dashboard
+    Route::get('/dashboard/stats',             [DashboardController::class, 'stats']);
+    Route::get('/dashboard/ultimas-acciones',  [DashboardController::class, 'ultimasAcciones']);
+    Route::get('/dashboard/empresas-recientes',[DashboardController::class, 'empresasRecientes']);
+    Route::get('/dashboard/clientes-estado',   [DashboardController::class, 'clientesPorEstado']);
+    Route::get('/dashboard/proximas-acciones', [DashboardController::class, 'proximasAcciones']);
+    Route::get('/dashboard/ingresos-admin',    [DashboardController::class, 'ingresosAdmin']);
+    Route::get('/dashboard/ingresos-empresa',  [DashboardController::class, 'ingresosEmpresa']);
 
-    // Acciones — todos los roles (el controller filtra por rol internamente)
-    Route::get('acciones',              [AccionController::class, 'index']);
-    Route::get('acciones/{id}',         [AccionController::class, 'show']);
-    Route::patch('acciones/{id}/pago',  [AccionController::class, 'actualizarPago']);
+    // Acciones — todos los roles
+    Route::get('acciones',             [AccionController::class, 'index']);
+    Route::get('acciones/{id}',        [AccionController::class, 'show']);
+    Route::patch('acciones/{id}/pago', [AccionController::class, 'actualizarPago']);
+
+    // Chat mensajes — todos los roles
     Route::get('acciones/{accionId}/mensajes',  [MensajeController::class, 'index']);
-     Route::post('acciones/{accionId}/mensajes', [MensajeController::class, 'store']);
+    Route::post('acciones/{accionId}/mensajes', [MensajeController::class, 'store']);
+
+    // Archivos — todos los roles (el controller filtra por rol)
+    Route::get('acciones/{accionId}/archivos',  [ArchivoController::class, 'index']);
+    Route::post('acciones/{accionId}/archivos', [ArchivoController::class, 'store']);
+    Route::get('clientes/{clienteId}/archivos', [ArchivoController::class, 'byCliente']);
+    Route::delete('archivos/{id}',              [ArchivoController::class, 'destroy']);
 
     // Acciones escritura — solo admin y empresa
     Route::middleware('role:admin,empresa')->group(function () {
-        Route::post('acciones',              [AccionController::class, 'store']);
-        Route::put('acciones/{id}',          [AccionController::class, 'update']);
-        Route::delete('acciones/{id}',       [AccionController::class, 'destroy']);
+        Route::post('acciones',        [AccionController::class, 'store']);
+        Route::put('acciones/{id}',    [AccionController::class, 'update']);
+        Route::delete('acciones/{id}', [AccionController::class, 'destroy']);
 
         Route::apiResource('empresas', EmpresaController::class);
         Route::apiResource('clientes', ClienteController::class);
