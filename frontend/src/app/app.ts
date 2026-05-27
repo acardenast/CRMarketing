@@ -5,8 +5,6 @@ import { SidebarComponent } from './shared/sidebar/sidebar.component';
 import { AuthService } from './services/auth.service';
 import { filter } from 'rxjs/operators';
 
-const NO_SIDEBAR_ROUTES = ['/', '/login', '/registro'];
-
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -22,8 +20,9 @@ export class AppComponent implements OnInit {
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe((e: NavigationEnd) => {
         const url = e.urlAfterRedirects;
-        const isPublic = url === '/' || NO_SIDEBAR_ROUTES.some(p => url.startsWith(p) && p !== '/');
-        this.showSidebar.set(!isPublic);
+        // Mostrar sidebar solo en rutas privadas (no en landing, login ni registro)
+        const isPrivate = url !== '/' && !url.startsWith('/login') && !url.startsWith('/registro');
+        this.showSidebar.set(isPrivate);
       });
   }
 
