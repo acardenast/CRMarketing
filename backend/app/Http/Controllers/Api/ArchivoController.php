@@ -12,9 +12,10 @@ use Illuminate\Support\Str;
 
 class ArchivoController extends Controller
 {
+    private string $disk = 'r2';
+
     /**
      * GET /api/acciones/{accionId}/archivos
-     * Lista archivos de una acción.
      */
     public function index($accionId)
     {
@@ -36,7 +37,6 @@ class ArchivoController extends Controller
 
     /**
      * GET /api/clientes/{clienteId}/archivos?accion_id=X
-     * Lista todos los archivos de un cliente, con filtro opcional por acción.
      */
     public function byCliente(Request $request, $clienteId)
     {
@@ -61,7 +61,6 @@ class ArchivoController extends Controller
 
     /**
      * POST /api/acciones/{accionId}/archivos
-     * Sube un archivo.
      */
     public function store(Request $request, $accionId)
     {
@@ -74,25 +73,28 @@ class ArchivoController extends Controller
             return response()->json(['message' => 'No autorizado'], 403);
 
         $request->validate([
-            'archivo' => 'required|file|max:20480', // 20 MB max
+            'archivo' => 'required|file|max:20480',
         ]);
 
-        $file          = $request->file('archivo');
+        $file           = $request->file('archivo');
         $nombreOriginal = $file->getClientOriginalName();
         $mime           = $file->getMimeType();
         $tamano         = $file->getSize();
         $nombreDisco    = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $ruta           = $file->storeAs('archivos', $nombreDisco, 'public');
+        $ruta           = 'archivos/' . $nombreDisco;
+
+        // Subir a Cloudflare R2
+        Storage::disk($this->disk)->put($ruta, file_get_contents($file), 'public');
 
         $archivo = Archivo::create([
-            'accion_id'      => $accionId,
-            'cliente_id'     => $accion->cliente_id,
-            'usuario_id'     => $user->rol !== 'cliente' ? $user->id : null,
-            'nombre_original'=> $nombreOriginal,
-            'nombre_disco'   => $nombreDisco,
-            'mime_type'      => $mime,
-            'tamano'         => $tamano,
-            'ruta'           => $ruta,
+            'accion_id'       => $accionId,
+            'cliente_id'      => $accion->cliente_id,
+            'usuario_id'      => $user->rol !== 'cliente' ? $user->id : null,
+            'nombre_original' => $nombreOriginal,
+            'nombre_disco'    => $nombreDisco,
+            'mime_type'       => $mime,
+            'tamano'          => $tamano,
+            'ruta'            => $ruta,
         ]);
 
         $archivo->load(['usuario', 'cliente']);
@@ -108,7 +110,6 @@ class ArchivoController extends Controller
         $user    = Auth::user();
         $archivo = Archivo::findOrFail($id);
 
-        // Solo admin o empresa propietaria pueden eliminar
         if ($user->rol === 'cliente')
             return response()->json(['message' => 'No autorizado'], 403);
 
@@ -118,7 +119,7 @@ class ArchivoController extends Controller
                 return response()->json(['message' => 'No autorizado'], 403);
         }
 
-        Storage::disk('public')->delete($archivo->ruta);
+        Storage::disk($this->disk)->delete($archivo->ruta);
         $archivo->delete();
 
         return response()->json(['message' => 'Eliminado']);
