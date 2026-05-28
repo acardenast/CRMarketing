@@ -286,50 +286,60 @@
   <div class="card-header">
     <h3 class="card-title">Resumen Financiero</h3>
   </div>
+
+  @let cobrado  = (ingresosEmpresa.ingresos_facturados ?? 0);
+  @let pendiente = (ingresosEmpresa.ingresos_pendientes ?? ingresosEmpresa.pendiente ?? 0);
+  @let total    = cobrado + pendiente;
+  @let pct      = total > 0 ? (cobrado / total * 100) : 0;
+
   <div class="fin-summary">
+    <!-- fila superior: etiqueta total -->
     <div class="fin-row fin-row--top">
-      <span class="fin-label">Facturado este mes</span>
-      <span class="fin-val fin-val--green">{{ (ingresosEmpresa.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</span>
+      <span class="fin-label">Total facturado</span>
+      <span class="fin-val fin-val--green">{{ total | currency:'EUR':'symbol':'1.0-0' }}</span>
     </div>
-    <div class="fin-bar-track">
-      <div class="fin-bar-fill"
-           [style.width.%]="(ingresosEmpresa.ingresos_facturados ?? 0) > 0
-             ? ((ingresosEmpresa.ingresos_netos ?? ingresosEmpresa.ingresos_facturados ?? 0) / (ingresosEmpresa.ingresos_facturados ?? 1) * 100)
-             : 0">
+
+    <!-- barra cobrado vs pendiente -->
+    <div class="fin-bar-wrap">
+      <div class="fin-bar-track">
+        <div class="fin-bar-fill" [style.width.%]="pct"></div>
       </div>
+      <span class="fin-bar-pct">{{ pct | number:'1.0-0' }}% cobrado</span>
     </div>
+
+    <!-- detalle cobrado -->
     <div class="fin-row">
-      <span class="fin-label">Cobrado</span>
-      <span class="fin-val">
-        {{ (ingresosEmpresa.ingresos_netos ?? ingresosEmpresa.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}
-        @if ((ingresosEmpresa.ingresos_facturados ?? 0) > 0) {
-          <span class="fin-pct">
-            {{ ((ingresosEmpresa.ingresos_netos ?? ingresosEmpresa.ingresos_facturados ?? 0) / (ingresosEmpresa.ingresos_facturados ?? 1) * 100) | number:'1.0-0' }}%
-          </span>
-        }
+      <span class="fin-label">
+        <span class="fin-dot fin-dot--green"></span>Cobrado
       </span>
+      <span class="fin-val fin-val--green">{{ cobrado | currency:'EUR':'symbol':'1.0-0' }}</span>
     </div>
+
+    <!-- detalle pendiente -->
     <div class="fin-row">
-      <span class="fin-label">Pendiente</span>
-      <span class="fin-val fin-val--orange">{{ (ingresosEmpresa.ingresos_pendientes ?? ingresosEmpresa.pendiente ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</span>
+      <span class="fin-label">
+        <span class="fin-dot fin-dot--orange"></span>Pendiente
+      </span>
+      <span class="fin-val fin-val--orange">{{ pendiente | currency:'EUR':'symbol':'1.0-0' }}</span>
     </div>
   </div>
+
   <div class="table-wrap" style="margin-top:1.5rem">
     <table class="data-table data-table--full">
       <thead>
         <tr>
           <th>Concepto</th>
-          <th class="text-right">Ingresos Netos</th>
-          <th class="text-right">Facturado</th>
+          <th class="text-right">Total facturado</th>
+          <th class="text-right">Cobrado</th>
           <th class="text-right">Pendiente</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td class="td-name">Total acumulado</td>
-          <td class="text-right">{{ (ingresosEmpresa.ingresos_netos ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
-          <td class="text-right td-green">{{ (ingresosEmpresa.ingresos_facturados ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
-          <td class="text-right td-warn">{{ (ingresosEmpresa.ingresos_pendientes ?? ingresosEmpresa.pendiente ?? 0) | currency:'EUR':'symbol':'1.0-0' }}</td>
+          <td class="td-name">Acumulado</td>
+          <td class="text-right">{{ total | currency:'EUR':'symbol':'1.0-0' }}</td>
+          <td class="text-right td-green">{{ cobrado | currency:'EUR':'symbol':'1.0-0' }}</td>
+          <td class="text-right td-warn">{{ pendiente | currency:'EUR':'symbol':'1.0-0' }}</td>
         </tr>
       </tbody>
     </table>

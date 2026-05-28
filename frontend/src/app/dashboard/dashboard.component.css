@@ -78,49 +78,82 @@
 .text-right { text-align: right; }
 .tfoot-row td { font-weight: 700; border-top: 2px solid var(--border, #e8e6df); border-bottom: none; }
 
-/* Resumen financiero */
-.fin-summary { background: var(--bg, #f5f4f0); border: 1px solid var(--border, #e8e6df); border-radius: .75rem; padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: .5rem; width: 100%; box-sizing: border-box; }
-.fin-row { display: flex; justify-content: space-between; align-items: center; font-family: 'Inter', sans-serif; font-size: .85rem; }
-.fin-row--top .fin-label { font-weight: 600; font-size: .9rem; color: var(--text, #1a1a1a); }
-.fin-label { color: var(--muted, #888); font-weight: 500; }
-.fin-val { font-weight: 700; color: var(--text, #1a1a1a); display: flex; align-items: center; gap: .4rem; }
-.fin-val--green { color: #006565; font-size: 1rem; } .fin-val--orange { color: #c07000; }
-.fin-pct { background: #e8f0ee; color: #006565; font-size: .7rem; font-weight: 700; padding: .15rem .4rem; border-radius: 4px; }
-.fin-bar-track { height: 7px; background: #e8e6df; border-radius: 4px; overflow: hidden; margin: .2rem 0; width: 100%; }
-.fin-bar-fill { height: 100%; background: #006565; border-radius: 4px; transition: width .6s ease; }
+/* ── Resumen Financiero ────────────────────────────────── */
+.fin-summary {
+  background: var(--bg, #f5f4f0);
+  border: 1px solid var(--border, #e8e6df);
+  border-radius: .875rem;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+.fin-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+  font-size: .875rem;
+}
+.fin-row--top .fin-label { font-weight: 700; font-size: .95rem; color: var(--text, #1a1a1a); }
+.fin-label {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  color: var(--muted, #888);
+  font-weight: 500;
+}
+.fin-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.fin-dot--green  { background: #006565; }
+.fin-dot--orange { background: #c07000; }
+
+.fin-val { font-weight: 700; color: var(--text, #1a1a1a); }
+.fin-val--green  { color: #006565; }
+.fin-val--orange { color: #c07000; }
+
+/* barra cobrado vs pendiente */
+.fin-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin: .15rem 0 .25rem;
+}
+.fin-bar-track {
+  flex: 1;
+  height: 10px;
+  background: #f0e8d8;   /* color pendiente de fondo */
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.fin-bar-fill {
+  height: 100%;
+  background: #006565;
+  border-radius: 9999px;
+  transition: width .6s ease;
+}
+.fin-bar-pct {
+  font-family: 'Inter', sans-serif;
+  font-size: .75rem;
+  font-weight: 600;
+  color: #006565;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
 /* Calendario cliente */
 .cal-section { }
 .cal-empty { text-align: center; padding: 2.5rem 1rem; color: #94a3b8; }
 .cal-empty p { font-size: .88rem; margin: .6rem 0 0; }
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: .75rem;
-}
-.cal-item {
-  display: flex;
-  align-items: center;
-  gap: .85rem;
-  padding: .9rem 1rem;
-  border: 1px solid var(--border, #e8e6df);
-  border-radius: .75rem;
-  background: var(--bg, #f5f4f0);
-  text-decoration: none;
-  transition: box-shadow .2s, border-color .2s, transform .15s;
-}
+.cal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .75rem; }
+.cal-item { display: flex; align-items: center; gap: .85rem; padding: .9rem 1rem; border: 1px solid var(--border, #e8e6df); border-radius: .75rem; background: var(--bg, #f5f4f0); text-decoration: none; transition: box-shadow .2s, border-color .2s, transform .15s; }
 .cal-item:hover { border-color: #006565; box-shadow: 0 4px 14px rgba(0,101,101,.1); transform: translateY(-1px); }
-.cal-date {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 44px; height: 44px;
-  border-radius: .5rem;
-  background: #006565;
-  color: #fff;
-  flex-shrink: 0;
-}
+.cal-date { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: .5rem; background: #006565; color: #fff; flex-shrink: 0; }
 .cal-day { font-size: 1.1rem; font-weight: 700; line-height: 1; }
 .cal-month { font-size: .62rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; opacity: .85; }
 .cal-info { display: flex; align-items: center; gap: .5rem; min-width: 0; flex: 1; }
